@@ -3,7 +3,8 @@
 Semantic lineage workspace for **MeaningDelta**, **RDE assessments**, and **human review** in VS Code / Cursor.
 
 **Spec:** [kotonoha-management `29_m3_minimal_ui_spec_draft.md`](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/29_m3_minimal_ui_spec_draft.md)  
-**Wireframes:** [`docs/ui-wireframes.md`](docs/ui-wireframes.md) · PNG in [`docs/images/`](docs/images/)
+**Wireframes:** [`docs/ui-wireframes.md`](docs/ui-wireframes.md) · PNG in [`docs/images/`](docs/images/)  
+**Acceptance:** [`docs/m3_acceptance.md`](docs/m3_acceptance.md) (M3 gate §6)
 
 ## Prerequisites
 
@@ -12,6 +13,14 @@ Semantic lineage workspace for **MeaningDelta**, **RDE assessments**, and **huma
 - [`kotonoha-core`](https://github.com/zyx-corporation/kotonoha-core) **≥ 0.1.9** (via CLI)
 - PostgreSQL + `DATABASE_URL` for register / attach / review
 
+### CLI compatibility
+
+| Extension | `kotonoha` CLI | `kotonoha-core` |
+| --- | --- | --- |
+| 0.1.x (M3) | ≥ 0.2.4 | ≥ 0.1.9 |
+
+M2 features (`rde attach --source-kind`, `export --format m2`) require these minimums.
+
 ## Settings
 
 | Key | Description |
@@ -19,28 +28,59 @@ Semantic lineage workspace for **MeaningDelta**, **RDE assessments**, and **huma
 | `kotonoha.cliPath` | CLI binary (default: `kotonoha`) |
 | `kotonoha.projectPath` | Repo root (default: workspace folder) |
 | `kotonoha.databaseUrl` | PostgreSQL URL (**do not commit**) |
-| `kotonoha.decidedBy` | Default reviewer identity |
+| `kotonoha.decidedBy` | Default identity for review decisions |
+
+## Install (development)
+
+```bash
+git clone https://github.com/zyx-corporation/kotonoha-vscode.git
+cd kotonoha-vscode
+npm install
+npm test
+npm run compile
+```
+
+**F5** in this folder → Extension Development Host. Open your Git project, configure `kotonoha.databaseUrl`.
+
+## Panels
+
+1. **Context** — repo / branch / commit / file / selection (`kotonoha status`)
+2. **Meaning Delta** — register ΔM (`kotonoha delta create` + observation JSON)
+3. **RDE & Review** — attach RDE (file or clipboard), review, m2 export preview
+
+## Relation to M1 / M2 CLI demos
+
+The extension calls the same commands as:
+
+- [Phase 2 acceptance demo](https://github.com/zyx-corporation/kotonoha-cli/blob/main/scripts/phase2_acceptance_demo.sh) (M1 path)
+- [M2 acceptance demo](https://github.com/zyx-corporation/kotonoha-cli/blob/main/scripts/m2_acceptance_demo.sh)
+
+Optional preflight before F5 UI walkthrough:
+
+```bash
+export DATABASE_URL='postgres://…'
+./scripts/m3_acceptance_cli_preflight.sh
+```
+
+See [`docs/m3_acceptance.md`](docs/m3_acceptance.md) for the full §6 checklist.
 
 ## Development
 
 ```bash
-npm install
-npm test            # Test First: unit tests (see CONTRIBUTING.md)
+npm test            # Test First — see CONTRIBUTING.md
 npm run compile
-# F5 → "Run Extension" (see .vscode/launch.json)
 ```
-
-Open a Git workspace, set `kotonoha.databaseUrl`, run `Kotonoha: Refresh Context` from the sidebar.
-
-## Panels (M3 scaffold)
-
-1. **Context** — repo / branch / commit / file / selection (`kotonoha status`)
-2. **Meaning Delta** — register ΔM (`kotonoha delta create`)
-3. **RDE & Review** — attach RDE, approve/hold/reject, copy m2 export
 
 ## Status
 
-**M3-a scaffold** — tracks [management#109](https://github.com/zyx-corporation/kotonoha-management/issues/109). Not published to Marketplace.
+**M3 Minimal UI** — tracks [management#104](https://github.com/zyx-corporation/kotonoha-management/issues/104). Not published to Marketplace.
+
+| Sub | Issue | Status |
+| --- | --- | --- |
+| M3-a | [#109](https://github.com/zyx-corporation/kotonoha-management/issues/109) | done |
+| M3-b | [#110](https://github.com/zyx-corporation/kotonoha-management/issues/110) | done |
+| M3-c | [#111](https://github.com/zyx-corporation/kotonoha-management/issues/111) | done |
+| M3-d | [#112](https://github.com/zyx-corporation/kotonoha-management/issues/112) | acceptance doc |
 
 ## License
 
