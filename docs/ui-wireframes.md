@@ -21,8 +21,8 @@ See implementation: `src/panels/*.ts`
 
 ## Panel 2 — Meaning Delta
 
-- Intended change (textarea) — *persistence via `source_context` planned M3-b+*
-- Observation fields → `observation` JSON
+- Intended change (textarea) → `observation.intended_change`
+- Preserved / lost / transformed / unresolved / drift → `observation` JSON
 - **Register ΔM** → `kotonoha delta create`
 
 ## Panel 3 — RDE & Review

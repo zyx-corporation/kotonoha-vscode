@@ -2,6 +2,12 @@ import * as vscode from "vscode";
 import { runCliOrThrow } from "../cli";
 import { getConfig } from "../config";
 import { buildDeltaCreateArgs } from "../deltaCreateArgs";
+import {
+  buildObservationFromForm,
+  computeLineAnchor,
+  observationHasPayload,
+  validateRegisterPreconditions,
+} from "../meaningDeltaForm";
 import { escapeHtml } from "../util/escapeHtml";
 import { session } from "../state";
 import { webviewShell } from "../webview/html";
@@ -32,8 +38,11 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
       ? vscode.workspace.asRelativePath(editor.document.uri, false)
       : "";
     const sel = editor?.selection;
-    const lineStart = sel ? sel.start.line + 1 : "";
-    const lineEnd = sel && !sel.isEmpty ? sel.end.line + 1 : sel ? sel.start.line + 1 : "";
+    const { lineStart, lineEnd } = computeLineAnchor(
+      sel?.start.line ?? null,
+      sel?.end.line ?? null,
+      Boolean(sel && !sel.isEmpty)
+    );
 
     webview.html = webviewShell(
       "Meaning Delta",
@@ -42,15 +51,17 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
   <div class="card">
     <label for="intended">Intended change (SHOULD)</label>
     <textarea id="intended" placeholder="What meaning change do you intend?"></textarea>
-    <label>Preserved (comma-separated, optional)</label>
+    <label for="preserved">Preserved (comma-separated, optional)</label>
     <input id="preserved" placeholder="intent, scope" />
-    <label>Lost (optional)</label>
+    <label for="lost">Lost (optional)</label>
     <input id="lost" />
-    <label>Transformed (optional)</label>
+    <label for="transformed">Transformed (optional)</label>
     <input id="transformed" />
-    <label>Unresolved (optional)</label>
+    <label for="unresolved">Unresolved (optional)</label>
     <input id="unresolved" />
-    <p class="note">Anchor: ${escapeHtml(relFile || "—")} · lines ${lineStart || "?"}–${lineEnd || "?"}</p>
+    <label for="drift">Drift (optional)</label>
+    <input id="drift" />
+    <p class="note">Anchor: ${escapeHtml(relFile || "—")} · lines ${lineStart ?? "?"}–${lineEnd ?? "?"}</p>
     <button onclick="register()">Register ΔM</button>
     ${session.lastDeltaId ? `<p class="ok">Last ΔM: ${escapeHtml(session.lastDeltaId)}</p>` : ""}
     ${message ? `<p class="${isError ? "error" : "ok"}">${escapeHtml(message)}</p>` : ""}
@@ -58,22 +69,17 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
   <script>
     const vscode = acquireVsCodeApi();
     function register() {
-      const obs = {};
-      const p = document.getElementById('preserved').value.trim();
-      const l = document.getElementById('lost').value.trim();
-      const t = document.getElementById('transformed').value.trim();
-      const u = document.getElementById('unresolved').value.trim();
-      if (p) obs.preserved = p.split(',').map(s => s.trim()).filter(Boolean);
-      if (l) obs.lost = l.split(',').map(s => s.trim()).filter(Boolean);
-      if (t) obs.transformed = [t];
-      if (u) obs.unresolved = [u];
       vscode.postMessage({
         type: 'register',
         intended: document.getElementById('intended').value,
-        observation: obs,
+        preservedCsv: document.getElementById('preserved').value,
+        lost: document.getElementById('lost').value,
+        transformed: document.getElementById('transformed').value,
+        unresolved: document.getElementById('unresolved').value,
+        drift: document.getElementById('drift').value,
         file: ${JSON.stringify(relFile)},
-        lineStart: ${lineStart || "null"},
-        lineEnd: ${lineEnd || "null"},
+        lineStart: ${lineStart !== null ? lineStart : "null"},
+        lineEnd: ${lineEnd !== null ? lineEnd : "null"},
       });
     }
   </script>`
@@ -82,35 +88,40 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
 
   private async registerDelta(
     msg: {
+      intended?: string;
+      preservedCsv?: string;
+      lost?: string;
+      transformed?: string;
+      unresolved?: string;
+      drift?: string;
       file: string;
       lineStart: number | null;
       lineEnd: number | null;
-      observation: Record<string, unknown>;
     },
     webview: vscode.Webview
   ): Promise<void> {
     const config = getConfig();
-    if (!config.databaseUrl) {
-      this.render(
-        webview,
-        "Set kotonoha.databaseUrl (or DATABASE_URL) before registering.",
-        true
-      );
-      return;
-    }
-    if (!msg.file) {
-      this.render(webview, "Open a file in the workspace first.", true);
+    const preflight = validateRegisterPreconditions({
+      databaseUrl: config.databaseUrl,
+      file: msg.file,
+    });
+    if (preflight) {
+      this.render(webview, preflight, true);
       return;
     }
 
-    const obsPath = await writeTempJson(msg.observation);
+    const observation = buildObservationFromForm(msg);
+    let obsPath: string | undefined;
+
     try {
-      const hasObs = Object.keys(msg.observation).length > 0;
+      if (observationHasPayload(observation)) {
+        obsPath = await writeTempJson(observation);
+      }
       const args = buildDeltaCreateArgs(
         msg.file,
         msg.lineStart,
         msg.lineEnd,
-        hasObs ? obsPath : undefined
+        obsPath
       );
       const id = await runCliOrThrow(args);
       session.lastDeltaId = id;
@@ -120,14 +131,18 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
       const text = e instanceof Error ? e.message : String(e);
       this.render(webview, text, true);
     } finally {
-      await vscode.workspace.fs.delete(vscode.Uri.file(obsPath));
+      if (obsPath) {
+        await vscode.workspace.fs.delete(vscode.Uri.file(obsPath));
+      }
     }
   }
 }
 
 async function writeTempJson(data: unknown): Promise<string> {
+  const root =
+    vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "/tmp";
   const uri = vscode.Uri.file(
-    `${vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "/tmp"}/.kotonoha-obs-${Date.now()}.json`
+    `${root}/.kotonoha-obs-${Date.now()}.json`
   );
   await vscode.workspace.fs.writeFile(
     uri,
