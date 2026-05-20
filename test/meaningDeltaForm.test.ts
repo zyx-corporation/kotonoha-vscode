@@ -21,7 +21,18 @@ describe("validateRegisterPreconditions", () => {
         databaseUrl: "postgres://x",
         file: "",
       }),
-      "Open a file in the workspace first."
+      "Open a file inside the workspace folder (not an out-of-workspace path)."
+    );
+  });
+
+  it("requires workspace folder (negative)", () => {
+    assert.match(
+      validateRegisterPreconditions({
+        databaseUrl: "postgres://x",
+        file: "a.md",
+        workspaceReady: false,
+      })!,
+      /folder workspace/i
     );
   });
 

@@ -20,9 +20,20 @@ export function parseStatus(stdout: string): Record<string, string> {
   for (const line of stdout.split("\n")) {
     const idx = line.indexOf(":");
     if (idx === -1) continue;
-    const key = line.slice(0, idx).trim();
+    let key = line.slice(0, idx).trim();
     const val = line.slice(idx + 1).trim();
-    out[key] = val;
+    if (key === "kotonoha") {
+      out["kotonoha_init"] = val;
+      continue;
+    }
+    if (key.startsWith("kotonoha ")) {
+      key = key.slice("kotonoha ".length);
+    }
+    if (key === "changes" && out["working tree"]) {
+      out["working tree"] = `${out["working tree"]} · ${val}`;
+    } else {
+      out[key] = val;
+    }
   }
   return out;
 }

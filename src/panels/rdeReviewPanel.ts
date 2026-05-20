@@ -13,6 +13,7 @@ import {
   validateReviewPreconditions,
 } from "../rdeReviewContract";
 import { session } from "../state";
+import { requireWorkspaceMessage } from "../workspace";
 import { escapeHtml } from "../util/escapeHtml";
 import { webviewShell } from "../webview/html";
 
@@ -27,6 +28,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     _token: vscode.CancellationToken
   ): void {
     webviewView.webview.options = { enableScripts: true };
+    this.webviewRef = webviewView.webview;
     this.render(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage(async (msg) => {
@@ -106,6 +108,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     const preflight = validateRdeAttachPreconditions({
       databaseUrl: config.databaseUrl,
       deltaId: session.lastDeltaId,
+      workspaceReady: requireWorkspaceMessage() === null,
     });
     if (preflight) {
       this.render(webview, undefined, preflight, true);
@@ -129,6 +132,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     const preflight = validateRdeAttachPreconditions({
       databaseUrl: config.databaseUrl,
       deltaId: session.lastDeltaId,
+      workspaceReady: requireWorkspaceMessage() === null,
     });
     if (preflight) {
       this.render(webview, undefined, preflight, true);
@@ -168,6 +172,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
       databaseUrl: config.databaseUrl,
       deltaId: session.lastDeltaId,
       decision,
+      workspaceReady: requireWorkspaceMessage() === null,
     });
     if (preflight) {
       this.render(webview, undefined, preflight, true);
@@ -226,6 +231,18 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
       );
     }
   }
+
+  public async runReviewFromCommand(decision: string): Promise<void> {
+    if (!this.webviewRef) {
+      vscode.window.showWarningMessage(
+        "Kotonoha: open the RDE & Review panel first."
+      );
+      return;
+    }
+    await this.review(decision, this.webviewRef);
+  }
+
+  private webviewRef?: vscode.Webview;
 
   public copyExport(): Promise<void> {
     return this.copyExportInternal();

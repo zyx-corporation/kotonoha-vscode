@@ -1,8 +1,10 @@
 import * as vscode from "vscode";
+import { buildStatusArgs } from "../cliArgs";
 import { runCli } from "../cli";
 import { parseStatus } from "../cliContract";
 import { getConfig } from "../config";
 import { escapeHtml } from "../util/escapeHtml";
+import { getEditorRelFile, requireWorkspaceMessage } from "../workspace";
 import { webviewShell } from "../webview/html";
 
 export class ContextPanelProvider implements vscode.WebviewViewProvider {
@@ -41,9 +43,7 @@ export class ContextPanelProvider implements vscode.WebviewViewProvider {
   public async render(webview: vscode.Webview): Promise<void> {
     const editor = vscode.window.activeTextEditor;
     const config = getConfig();
-    const relFile = editor
-      ? vscode.workspace.asRelativePath(editor.document.uri, false)
-      : "—";
+    const relFile = getEditorRelFile(editor) || "—";
     const sel = editor?.selection;
     const selection =
       sel && !sel.isEmpty
@@ -52,16 +52,18 @@ export class ContextPanelProvider implements vscode.WebviewViewProvider {
           ? `L${sel.start.line + 1}:${sel.start.character + 1}`
           : "—";
 
+    const wsMsg = requireWorkspaceMessage();
     let statusBlock = "";
-    let error = "";
+    let error = wsMsg ?? "";
 
-    try {
-      const result = await runCli(["status"]);
-      if (result.code !== 0) {
-        error = result.stderr || `status exited ${result.code}`;
-      } else {
-        const s = parseStatus(result.stdout);
-        statusBlock = `
+    if (!error) {
+      try {
+        const result = await runCli(buildStatusArgs(config.projectPath));
+        if (result.code !== 0) {
+          error = result.stderr || `status exited ${result.code}`;
+        } else {
+          const s = parseStatus(result.stdout);
+          statusBlock = `
 <dl>
   <dt>repository</dt><dd>${escapeHtml(s["repository"] ?? (config.projectPath || "—"))}</dd>
   <dt>branch</dt><dd>${escapeHtml(s["branch"] ?? "—")}</dd>
@@ -69,10 +71,13 @@ export class ContextPanelProvider implements vscode.WebviewViewProvider {
   <dt>working tree</dt><dd>${escapeHtml(s["working tree"] ?? "—")}</dd>
   <dt>database</dt><dd>${escapeHtml(s["database"] ?? "—")}</dd>
   <dt>meaning_deltas</dt><dd>${escapeHtml(s["meaning_deltas"] ?? "—")}</dd>
+  <dt>project_id</dt><dd>${escapeHtml(s["project_id"] ?? "—")}</dd>
+  <dt>kotonoha init</dt><dd>${escapeHtml(s["kotonoha_init"] ?? "ok")}</dd>
 </dl>`;
+        }
+      } catch (e) {
+        error = e instanceof Error ? e.message : String(e);
       }
-    } catch (e) {
-      error = e instanceof Error ? e.message : String(e);
     }
 
     webview.html = webviewShell(

@@ -36,4 +36,17 @@ describe("parseStatus", () => {
   it("uses first colon only when value contains colons", () => {
     assert.deepEqual(parseStatus("note: time: 12:00"), { note: "time: 12:00" });
   });
+
+  it("merges dirty changes line into working tree (positive)", () => {
+    const s = parseStatus(
+      "working tree: dirty\nchanges: staged=1 unstaged=0 untracked=0"
+    );
+    assert.match(s["working tree"], /dirty/);
+    assert.match(s["working tree"], /staged=1/);
+  });
+
+  it("parses kotonoha init line (positive)", () => {
+    const s = parseStatus("kotonoha: not initialized (run `kotonoha init`)");
+    assert.match(s["kotonoha_init"], /not initialized/);
+  });
 });

@@ -31,22 +31,25 @@ export async function runCli(
     const child = spawn(config.cliPath, args, {
       cwd,
       env: cliEnv(config),
-      stdio: ["pipe", "pipe", "pipe"],
+      stdio:
+        stdin !== undefined
+          ? ["pipe", "pipe", "pipe"]
+          : ["ignore", "pipe", "pipe"],
     });
 
     let stdout = "";
     let stderr = "";
-    child.stdout.on("data", (d) => (stdout += d.toString()));
-    child.stderr.on("data", (d) => (stderr += d.toString()));
+    child.stdout?.on("data", (d) => (stdout += d.toString()));
+    child.stderr?.on("data", (d) => (stderr += d.toString()));
     child.on("error", (err) => reject(err));
     child.on("close", (code) => {
       resolve({ code: code ?? 1, stdout, stderr });
     });
 
-    if (stdin !== undefined) {
+    if (stdin !== undefined && child.stdin) {
       child.stdin.write(stdin);
+      child.stdin.end();
     }
-    child.stdin.end();
   });
 }
 
