@@ -1,0 +1,127 @@
+{
+  "name": "kotonoha",
+  "displayName": "Kotonoha",
+  "description": "Semantic lineage (MeaningDelta, RDE, Review) in VS Code — M3 Minimal UI",
+  "version": "0.1.0",
+  "publisher": "zyx-corporation",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zyx-corporation/kotonoha-vscode"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Kotonoha",
+      "properties": {
+        "kotonoha.cliPath": {
+          "type": "string",
+          "default": "kotonoha",
+          "description": "Path to the kotonoha CLI binary."
+        },
+        "kotonoha.projectPath": {
+          "type": "string",
+          "default": "",
+          "description": "Repository root (empty = workspace folder)."
+        },
+        "kotonoha.databaseUrl": {
+          "type": "string",
+          "default": "",
+          "description": "PostgreSQL URL (prefer SecretStorage in future; do not commit)."
+        },
+        "kotonoha.decidedBy": {
+          "type": "string",
+          "default": "",
+          "description": "Default identity for review decisions."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "kotonoha.refreshContext",
+        "title": "Kotonoha: Refresh Context",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "kotonoha.registerMeaningDelta",
+        "title": "Kotonoha: Register Meaning Delta",
+        "icon": "$(add)"
+      },
+      {
+        "command": "kotonoha.attachRde",
+        "title": "Kotonoha: Attach RDE Assessment",
+        "icon": "$(json)"
+      },
+      {
+        "command": "kotonoha.reviewApprove",
+        "title": "Kotonoha: Review — Approve"
+      },
+      {
+        "command": "kotonoha.reviewHold",
+        "title": "Kotonoha: Review — Hold"
+      },
+      {
+        "command": "kotonoha.reviewReject",
+        "title": "Kotonoha: Review — Reject"
+      },
+      {
+        "command": "kotonoha.copyExport",
+        "title": "Kotonoha: Copy Export (m2) to Clipboard"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "kotonoha",
+          "title": "Kotonoha",
+          "icon": "media/kotonoha.svg"
+        }
+      ]
+    },
+    "views": {
+      "kotonoha": [
+        {
+          "type": "webview",
+          "id": "kotonoha.context",
+          "name": "Context"
+        },
+        {
+          "type": "webview",
+          "id": "kotonoha.meaningDelta",
+          "name": "Meaning Delta"
+        },
+        {
+          "type": "webview",
+          "id": "kotonoha.rdeReview",
+          "name": "RDE & Review"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "kotonoha.refreshContext",
+          "when": "view == kotonoha.context",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "tsc -p ./ --noEmit",
+    "vscode:prepublish": "npm run compile",
+    "package": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.0"
+  }
+}
