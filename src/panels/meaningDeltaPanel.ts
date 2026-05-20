@@ -10,10 +10,23 @@ import {
 } from "../meaningDeltaForm";
 import { escapeHtml } from "../util/escapeHtml";
 import { session } from "../state";
+import { getEditorRelFile, requireWorkspaceMessage } from "../workspace";
 import { webviewShell } from "../webview/html";
+
+interface FormState {
+  intended?: string;
+  preservedCsv?: string;
+  lost?: string;
+  transformed?: string;
+  unresolved?: string;
+  drift?: string;
+}
 
 export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "kotonoha.meaningDelta";
+
+  private webview?: vscode.Webview;
+  private lastForm: FormState = {};
 
   constructor(private readonly extensionUri: vscode.Uri) {}
 
@@ -23,26 +36,44 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
     _token: vscode.CancellationToken
   ): void {
     webviewView.webview.options = { enableScripts: true };
-    this.render(webviewView.webview);
+    this.webview = webviewView.webview;
+    this.render(this.webview);
 
     webviewView.webview.onDidReceiveMessage(async (msg) => {
       if (msg.type === "register") {
-        await this.registerDelta(msg, webviewView.webview);
+        this.lastForm = {
+          intended: msg.intended,
+          preservedCsv: msg.preservedCsv,
+          lost: msg.lost,
+          transformed: msg.transformed,
+          unresolved: msg.unresolved,
+          drift: msg.drift,
+        };
+        await this.registerDelta(msg, this.webview!);
       }
     });
   }
 
-  private render(webview: vscode.Webview, message?: string, isError?: boolean): void {
+  public refresh(): void {
+    if (this.webview) {
+      this.render(this.webview);
+    }
+  }
+
+  private render(
+    webview: vscode.Webview,
+    message?: string,
+    isError?: boolean
+  ): void {
     const editor = vscode.window.activeTextEditor;
-    const relFile = editor
-      ? vscode.workspace.asRelativePath(editor.document.uri, false)
-      : "";
+    const relFile = getEditorRelFile(editor);
     const sel = editor?.selection;
     const { lineStart, lineEnd } = computeLineAnchor(
       sel?.start.line ?? null,
       sel?.end.line ?? null,
       Boolean(sel && !sel.isEmpty)
     );
+    const f = this.lastForm;
 
     webview.html = webviewShell(
       "Meaning Delta",
@@ -50,17 +81,17 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
   <h2>Meaning delta (ΔM)</h2>
   <div class="card">
     <label for="intended">Intended change (SHOULD)</label>
-    <textarea id="intended" placeholder="What meaning change do you intend?"></textarea>
+    <textarea id="intended" placeholder="What meaning change do you intend?">${escapeHtml(f.intended ?? "")}</textarea>
     <label for="preserved">Preserved (comma-separated, optional)</label>
-    <input id="preserved" placeholder="intent, scope" />
+    <input id="preserved" value="${escapeHtml(f.preservedCsv ?? "")}" placeholder="intent, scope" />
     <label for="lost">Lost (optional)</label>
-    <input id="lost" />
+    <input id="lost" value="${escapeHtml(f.lost ?? "")}" />
     <label for="transformed">Transformed (optional)</label>
-    <input id="transformed" />
+    <input id="transformed" value="${escapeHtml(f.transformed ?? "")}" />
     <label for="unresolved">Unresolved (optional)</label>
-    <input id="unresolved" />
+    <input id="unresolved" value="${escapeHtml(f.unresolved ?? "")}" />
     <label for="drift">Drift (optional)</label>
-    <input id="drift" />
+    <input id="drift" value="${escapeHtml(f.drift ?? "")}" />
     <p class="note">Anchor: ${escapeHtml(relFile || "—")} · lines ${lineStart ?? "?"}–${lineEnd ?? "?"}</p>
     <button onclick="register()">Register ΔM</button>
     ${session.lastDeltaId ? `<p class="ok">Last ΔM: ${escapeHtml(session.lastDeltaId)}</p>` : ""}
@@ -101,9 +132,11 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
     webview: vscode.Webview
   ): Promise<void> {
     const config = getConfig();
+    const ws = requireWorkspaceMessage();
     const preflight = validateRegisterPreconditions({
       databaseUrl: config.databaseUrl,
       file: msg.file,
+      workspaceReady: ws === null,
     });
     if (preflight) {
       this.render(webview, preflight, true);
@@ -115,7 +148,7 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
 
     try {
       if (observationHasPayload(observation)) {
-        obsPath = await writeTempJson(observation);
+        obsPath = await writeTempJson(config.projectPath, observation);
       }
       const args = buildDeltaCreateArgs(
         msg.file,
@@ -138,9 +171,14 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
   }
 }
 
-async function writeTempJson(data: unknown): Promise<string> {
-  const root =
-    vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "/tmp";
+async function writeTempJson(
+  projectRoot: string,
+  data: unknown
+): Promise<string> {
+  const root = projectRoot || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  if (!root) {
+    throw new Error("No workspace folder for observation temp file.");
+  }
   const uri = vscode.Uri.file(
     `${root}/.kotonoha-obs-${Date.now()}.json`
   );

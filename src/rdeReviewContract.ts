@@ -65,7 +65,11 @@ export function parseReviewDecision(raw: string): ReviewDecision | null {
 export function validateRdeAttachPreconditions(opts: {
   databaseUrl: string;
   deltaId: string | null | undefined;
+  workspaceReady?: boolean;
 }): string | null {
+  if (opts.workspaceReady === false) {
+    return "Open a folder workspace (Git repository) before using Kotonoha.";
+  }
   if (!opts.databaseUrl?.trim()) {
     return "Set kotonoha.databaseUrl (or DATABASE_URL) before attaching RDE.";
   }
@@ -79,10 +83,12 @@ export function validateReviewPreconditions(opts: {
   databaseUrl: string;
   deltaId: string | null | undefined;
   decision: string;
+  workspaceReady?: boolean;
 }): string | null {
   const base = validateRdeAttachPreconditions({
     databaseUrl: opts.databaseUrl,
     deltaId: opts.deltaId,
+    workspaceReady: opts.workspaceReady,
   });
   if (base) {
     return base.replace("attaching RDE", "recording review");

@@ -34,8 +34,8 @@ export DATABASE_URL='postgres://…'
 2. Build or install `kotonoha` on `PATH` (`which kotonoha`).
 3. Run `kotonoha db migrate` with `DATABASE_URL` set.
 4. Open **`kotonoha-vscode`** folder → **F5** (Run Extension).
-5. In the Extension Development Host, open the sample repo.
-6. **Settings** → `kotonoha.databaseUrl` = your `DATABASE_URL` (do not commit).
+5. In the Extension Development Host, **File → Open Folder** on the sample repo (not the `kotonoha-vscode` extension folder alone).
+6. **Settings** (workspace) → `kotonoha.databaseUrl` = your `DATABASE_URL` (do not commit).
 7. Optional: `kotonoha.decidedBy` = reviewer identity.
 
 ---

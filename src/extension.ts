@@ -2,11 +2,17 @@ import * as vscode from "vscode";
 import { ContextPanelProvider } from "./panels/contextPanel";
 import { MeaningDeltaPanelProvider } from "./panels/meaningDeltaPanel";
 import { RdeReviewPanelProvider } from "./panels/rdeReviewPanel";
+import { parseReviewDecision } from "./rdeReviewContract";
 
 export function activate(context: vscode.ExtensionContext): void {
   const contextPanel = new ContextPanelProvider(context.extensionUri);
   const meaningDeltaPanel = new MeaningDeltaPanelProvider(context.extensionUri);
   const rdeReviewPanel = new RdeReviewPanelProvider();
+
+  const refreshEditorContext = (): void => {
+    contextPanel.refresh();
+    meaningDeltaPanel.refresh();
+  };
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
@@ -36,10 +42,33 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand("kotonoha.copyExport", () => {
       rdeReviewPanel.copyExport();
     }),
+    vscode.commands.registerCommand("kotonoha.reviewApprove", () => {
+      void runReviewCommand(rdeReviewPanel, "approve");
+    }),
+    vscode.commands.registerCommand("kotonoha.reviewHold", () => {
+      void runReviewCommand(rdeReviewPanel, "hold");
+    }),
+    vscode.commands.registerCommand("kotonoha.reviewReject", () => {
+      void runReviewCommand(rdeReviewPanel, "reject");
+    }),
     vscode.window.onDidChangeActiveTextEditor(() => {
-      contextPanel.refresh();
+      refreshEditorContext();
+    }),
+    vscode.window.onDidChangeTextEditorSelection(() => {
+      refreshEditorContext();
     })
   );
+}
+
+async function runReviewCommand(
+  panel: RdeReviewPanelProvider,
+  decision: string
+): Promise<void> {
+  if (!parseReviewDecision(decision)) {
+    return;
+  }
+  await vscode.commands.executeCommand("kotonoha.rdeReview.focus");
+  await panel.runReviewFromCommand(decision);
 }
 
 export function deactivate(): void {}

@@ -12,12 +12,16 @@ export interface MeaningDeltaFormInput {
 export function validateRegisterPreconditions(opts: {
   databaseUrl: string;
   file: string;
+  workspaceReady?: boolean;
 }): string | null {
+  if (opts.workspaceReady === false) {
+    return "Open a folder workspace (Git repository) before using Kotonoha.";
+  }
   if (!opts.databaseUrl?.trim()) {
     return "Set kotonoha.databaseUrl (or DATABASE_URL) before registering.";
   }
   if (!opts.file?.trim()) {
-    return "Open a file in the workspace first.";
+    return "Open a file inside the workspace folder (not an out-of-workspace path).";
   }
   return null;
 }
