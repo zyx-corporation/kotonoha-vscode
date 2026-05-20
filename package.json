@@ -115,6 +115,7 @@
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
+    "test": "npm run compile && tsc -p tsconfig.test.json && node --test out-test/*.test.js",
     "lint": "tsc -p ./ --noEmit",
     "vscode:prepublish": "npm run compile",
     "package": "vsce package --no-dependencies"

@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import { runCliOrThrow } from "../cli";
 import { getConfig } from "../config";
+import { buildDeltaCreateArgs } from "../deltaCreateArgs";
+import { escapeHtml } from "../util/escapeHtml";
 import { session } from "../state";
 import { webviewShell } from "../webview/html";
 
@@ -48,10 +50,10 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
     <input id="transformed" />
     <label>Unresolved (optional)</label>
     <input id="unresolved" />
-    <p class="note">Anchor: ${esc(relFile || "—")} · lines ${lineStart || "?"}–${lineEnd || "?"}</p>
+    <p class="note">Anchor: ${escapeHtml(relFile || "—")} · lines ${lineStart || "?"}–${lineEnd || "?"}</p>
     <button onclick="register()">Register ΔM</button>
-    ${session.lastDeltaId ? `<p class="ok">Last ΔM: ${esc(session.lastDeltaId)}</p>` : ""}
-    ${message ? `<p class="${isError ? "error" : "ok"}">${esc(message)}</p>` : ""}
+    ${session.lastDeltaId ? `<p class="ok">Last ΔM: ${escapeHtml(session.lastDeltaId)}</p>` : ""}
+    ${message ? `<p class="${isError ? "error" : "ok"}">${escapeHtml(message)}</p>` : ""}
   </div>
   <script>
     const vscode = acquireVsCodeApi();
@@ -103,16 +105,13 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
 
     const obsPath = await writeTempJson(msg.observation);
     try {
-      const args = ["delta", "create", msg.file];
-      if (msg.lineStart != null) {
-        args.push("--line-start", String(msg.lineStart));
-      }
-      if (msg.lineEnd != null) {
-        args.push("--line-end", String(msg.lineEnd));
-      }
-      if (Object.keys(msg.observation).length > 0) {
-        args.push(obsPath);
-      }
+      const hasObs = Object.keys(msg.observation).length > 0;
+      const args = buildDeltaCreateArgs(
+        msg.file,
+        msg.lineStart,
+        msg.lineEnd,
+        hasObs ? obsPath : undefined
+      );
       const id = await runCliOrThrow(args);
       session.lastDeltaId = id;
       this.render(webview, `Registered meaning delta: ${id}`);
@@ -135,8 +134,4 @@ async function writeTempJson(data: unknown): Promise<string> {
     Buffer.from(JSON.stringify(data, null, 2), "utf8")
   );
   return uri.fsPath;
-}
-
-function esc(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }

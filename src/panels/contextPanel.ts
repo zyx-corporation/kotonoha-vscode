@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
-import { runCli, parseStatus } from "../cli";
+import { runCli } from "../cli";
+import { parseStatus } from "../cliContract";
 import { getConfig } from "../config";
+import { escapeHtml } from "../util/escapeHtml";
 import { webviewShell } from "../webview/html";
 
 export class ContextPanelProvider implements vscode.WebviewViewProvider {
@@ -61,12 +63,12 @@ export class ContextPanelProvider implements vscode.WebviewViewProvider {
         const s = parseStatus(result.stdout);
         statusBlock = `
 <dl>
-  <dt>repository</dt><dd>${esc(s["repository"] ?? (config.projectPath || "—"))}</dd>
-  <dt>branch</dt><dd>${esc(s["branch"] ?? "—")}</dd>
-  <dt>commit</dt><dd>${esc(s["commit"] ?? "—")}</dd>
-  <dt>working tree</dt><dd>${esc(s["working tree"] ?? "—")}</dd>
-  <dt>database</dt><dd>${esc(s["database"] ?? "—")}</dd>
-  <dt>meaning_deltas</dt><dd>${esc(s["meaning_deltas"] ?? "—")}</dd>
+  <dt>repository</dt><dd>${escapeHtml(s["repository"] ?? (config.projectPath || "—"))}</dd>
+  <dt>branch</dt><dd>${escapeHtml(s["branch"] ?? "—")}</dd>
+  <dt>commit</dt><dd>${escapeHtml(s["commit"] ?? "—")}</dd>
+  <dt>working tree</dt><dd>${escapeHtml(s["working tree"] ?? "—")}</dd>
+  <dt>database</dt><dd>${escapeHtml(s["database"] ?? "—")}</dd>
+  <dt>meaning_deltas</dt><dd>${escapeHtml(s["meaning_deltas"] ?? "—")}</dd>
 </dl>`;
       }
     } catch (e) {
@@ -79,11 +81,11 @@ export class ContextPanelProvider implements vscode.WebviewViewProvider {
   <h2>Current context</h2>
   <div class="card">
     <dl>
-      <dt>active file</dt><dd>${esc(relFile)}</dd>
-      <dt>selection</dt><dd>${esc(selection)}</dd>
+      <dt>active file</dt><dd>${escapeHtml(relFile)}</dd>
+      <dt>selection</dt><dd>${escapeHtml(selection)}</dd>
     </dl>
     ${statusBlock}
-    ${error ? `<p class="error">${esc(error)}</p>` : ""}
+    ${error ? `<p class="error">${escapeHtml(error)}</p>` : ""}
     <button onclick="refresh()">Refresh</button>
   </div>
   <p class="note">Git diff: use VS Code Source Control or <code>kotonoha diff</code>.</p>
@@ -93,12 +95,4 @@ export class ContextPanelProvider implements vscode.WebviewViewProvider {
   </script>`
     );
   }
-}
-
-function esc(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }

@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { runCli, runCliOrThrow } from "../cli";
 import { session } from "../state";
+import { escapeHtml } from "../util/escapeHtml";
 import { webviewShell } from "../webview/html";
 
 export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
@@ -44,10 +45,10 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
       `
   <h2>RDE assessment</h2>
   <div class="card">
-    <p class="note">ΔM: <code>${esc(String(delta))}</code></p>
+    <p class="note">ΔM: <code>${escapeHtml(String(delta))}</code></p>
     <button onclick="attach()">Attach RDE (pick JSON file)</button>
     <button class="secondary" onclick="refresh()">Refresh export preview</button>
-    ${session.lastAssessmentId ? `<p class="ok">Last assessment: ${esc(session.lastAssessmentId)}</p>` : ""}
+    ${session.lastAssessmentId ? `<p class="ok">Last assessment: ${escapeHtml(session.lastAssessmentId)}</p>` : ""}
   </div>
   <h2>Review</h2>
   <div class="card">
@@ -57,8 +58,8 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     <button class="secondary" onclick="review('reject')">Reject</button>
     <button class="secondary" onclick="exportM2()">Copy export (m2)</button>
   </div>
-  ${exportPreview ? `<h2>Export preview</h2><pre class="card" style="white-space:pre-wrap;font-size:10px;max-height:160px;overflow:auto">${esc(exportPreview)}</pre>` : ""}
-  ${message ? `<p class="${isError ? "error" : "ok"}">${esc(message)}</p>` : ""}
+  ${exportPreview ? `<h2>Export preview</h2><pre class="card" style="white-space:pre-wrap;font-size:10px;max-height:160px;overflow:auto">${escapeHtml(exportPreview)}</pre>` : ""}
+  ${message ? `<p class="${isError ? "error" : "ok"}">${escapeHtml(message)}</p>` : ""}
   <script>
     const vscode = acquireVsCodeApi();
     function attach() { vscode.postMessage({ type: 'attach' }); }
@@ -168,8 +169,4 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
       );
     }
   }
-}
-
-function esc(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }

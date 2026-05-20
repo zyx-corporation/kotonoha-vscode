@@ -25,6 +25,7 @@ Semantic lineage workspace for **MeaningDelta**, **RDE assessments**, and **huma
 
 ```bash
 npm install
+npm test            # Test First: unit tests (see CONTRIBUTING.md)
 npm run compile
 # F5 → "Run Extension" (see .vscode/launch.json)
 ```

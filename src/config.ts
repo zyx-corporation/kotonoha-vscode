@@ -1,11 +1,8 @@
 import * as vscode from "vscode";
+import type { KotonohaConfig } from "./cliEnv";
 
-export interface KotonohaConfig {
-  cliPath: string;
-  projectPath: string;
-  databaseUrl: string;
-  decidedBy: string;
-}
+export type { KotonohaConfig } from "./cliEnv";
+export { cliEnv } from "./cliEnv";
 
 export function getConfig(): KotonohaConfig {
   const cfg = vscode.workspace.getConfiguration("kotonoha");
@@ -17,15 +14,4 @@ export function getConfig(): KotonohaConfig {
     databaseUrl: cfg.get<string>("databaseUrl", ""),
     decidedBy: cfg.get<string>("decidedBy", ""),
   };
-}
-
-export function cliEnv(config: KotonohaConfig): NodeJS.ProcessEnv {
-  const env = { ...process.env };
-  if (config.databaseUrl) {
-    env.DATABASE_URL = config.databaseUrl;
-  }
-  if (config.decidedBy) {
-    env.KOTONOHA_DECIDED_BY = config.decidedBy;
-  }
-  return env;
 }
