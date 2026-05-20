@@ -27,9 +27,10 @@ See implementation: `src/panels/*.ts`
 
 ## Panel 3 — RDE & Review
 
-- Attach RDE JSON file → `kotonoha rde attach --source-kind cli`
-- Approve / Hold / Reject → `kotonoha review *`
-- Copy export → `kotonoha export --format m2`
+- Attach RDE JSON file or clipboard → `kotonoha rde attach --source-kind cli`
+- Export preview → `kotonoha export --format m2` (`validation_report` warnings, human-review flag)
+- Approve / Hold / Reject → `kotonoha review *` (`kotonoha.decidedBy` when set)
+- Copy export → clipboard (m2 JSON)
 
 **Human responsibility banner:** “RDE does not substitute for human judgment.”
 
