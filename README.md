@@ -4,7 +4,8 @@ Semantic lineage workspace for **MeaningDelta**, **RDE assessments**, and **huma
 
 **Spec:** [kotonoha-management `29_m3_minimal_ui_spec_draft.md`](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/29_m3_minimal_ui_spec_draft.md)  
 **Wireframes:** [`docs/ui-wireframes.md`](docs/ui-wireframes.md) · PNG in [`docs/images/`](docs/images/)  
-**Acceptance:** [`docs/m3_acceptance.md`](docs/m3_acceptance.md) (M3 gate §6)
+**Acceptance:** [`docs/m3_acceptance.md`](docs/m3_acceptance.md) (M3 gate §6)  
+**Operations manual:** [kotonoha-docs `ja/manual/vscode_extension_operations.md`](https://github.com/zyx-corporation/kotonoha-docs/blob/main/ja/manual/vscode_extension_operations.md)
 
 ## Prerequisites
 
@@ -41,6 +42,18 @@ npm run compile
 ```
 
 **F5** in this folder → Extension Development Host. Open your Git project, configure `kotonoha.databaseUrl`.
+
+## Keyboard shortcuts (default)
+
+| Action | macOS | Windows / Linux |
+| --- | --- | --- |
+| Show Kotonoha sidebar | `Cmd+Alt+K` | `Ctrl+Alt+K` |
+| Context panel | `Cmd+Alt+Shift+C` | `Ctrl+Alt+Shift+C` |
+| Meaning Delta panel | `Cmd+Alt+Shift+M` | `Ctrl+Alt+Shift+M` |
+| RDE & Review panel | `Cmd+Alt+Shift+R` | `Ctrl+Alt+Shift+R` |
+| Register ΔM (focus + command) | `Cmd+Alt+Shift+D` | `Ctrl+Alt+Shift+D` |
+
+Each panel title bar has a **Kotonoha** icon button (opens the sidebar). Rebind via **Keyboard Shortcuts** (`kotonoha.*`).
 
 ## Panels
 

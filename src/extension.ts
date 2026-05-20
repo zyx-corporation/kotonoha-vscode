@@ -4,6 +4,15 @@ import { MeaningDeltaPanelProvider } from "./panels/meaningDeltaPanel";
 import { RdeReviewPanelProvider } from "./panels/rdeReviewPanel";
 import { parseReviewDecision } from "./rdeReviewContract";
 
+async function openKotonohaActivity(): Promise<void> {
+  await vscode.commands.executeCommand("workbench.view.extension.kotonoha");
+}
+
+async function focusKotonohaView(viewId: string): Promise<void> {
+  await openKotonohaActivity();
+  await vscode.commands.executeCommand(`${viewId}.focus`);
+}
+
 export function activate(context: vscode.ExtensionContext): void {
   const contextPanel = new ContextPanelProvider(context.extensionUri);
   const meaningDeltaPanel = new MeaningDeltaPanelProvider(context.extensionUri);
@@ -30,14 +39,26 @@ export function activate(context: vscode.ExtensionContext): void {
       rdeReviewPanel,
       { webviewOptions: { retainContextWhenHidden: true } }
     ),
+    vscode.commands.registerCommand("kotonoha.openActivity", () => {
+      void openKotonohaActivity();
+    }),
+    vscode.commands.registerCommand("kotonoha.focusContext", () => {
+      void focusKotonohaView(ContextPanelProvider.viewType);
+    }),
+    vscode.commands.registerCommand("kotonoha.focusMeaningDelta", () => {
+      void focusKotonohaView(MeaningDeltaPanelProvider.viewType);
+    }),
+    vscode.commands.registerCommand("kotonoha.focusRdeReview", () => {
+      void focusKotonohaView(RdeReviewPanelProvider.viewType);
+    }),
     vscode.commands.registerCommand("kotonoha.refreshContext", () => {
       contextPanel.refresh();
     }),
     vscode.commands.registerCommand("kotonoha.registerMeaningDelta", () => {
-      void vscode.commands.executeCommand("kotonoha.meaningDelta.focus");
+      void focusKotonohaView(MeaningDeltaPanelProvider.viewType);
     }),
     vscode.commands.registerCommand("kotonoha.attachRde", () => {
-      void vscode.commands.executeCommand("kotonoha.rdeReview.focus");
+      void focusKotonohaView(RdeReviewPanelProvider.viewType);
     }),
     vscode.commands.registerCommand("kotonoha.copyExport", () => {
       rdeReviewPanel.copyExport();
@@ -67,7 +88,7 @@ async function runReviewCommand(
   if (!parseReviewDecision(decision)) {
     return;
   }
-  await vscode.commands.executeCommand("kotonoha.rdeReview.focus");
+  await focusKotonohaView(RdeReviewPanelProvider.viewType);
   await panel.runReviewFromCommand(decision);
 }
 
