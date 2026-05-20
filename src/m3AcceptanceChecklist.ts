@@ -47,6 +47,24 @@ export const M3_GATE_CHECKLIST: readonly M3GateItem[] = [
       "README にインストール・設定・M1 デモとの関係が書かれている",
     verify: "README.md: Prerequisites, Settings, Acceptance, CLI 互換表",
   },
+  {
+    id: "i18n-ja",
+    criterion: "UI 多言語化（日本語）",
+    verify:
+      "VS Code 表示言語=日本語で主要操作（Context→ΔM→RDE→Review）が日本語 UI",
+  },
+  {
+    id: "i18n-en",
+    criterion: "UI 多言語化（英語）",
+    verify:
+      "VS Code 表示言語=English で同操作が英語 UI（management 32 §1）",
+  },
+  {
+    id: "design-review",
+    criterion: "UI デザイン評価",
+    verify:
+      "D1〜D5 記録・Pass または Pass with notes（ui-design-review-m3.md または #104）",
+  },
 ] as const;
 
 export const M3_GATE_FORMAT = "kotonoha.m3_gate.v0.1";

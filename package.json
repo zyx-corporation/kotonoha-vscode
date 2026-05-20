@@ -43,6 +43,29 @@
     },
     "commands": [
       {
+        "command": "kotonoha.openActivity",
+        "title": "Kotonoha: Show Sidebar",
+        "icon": {
+          "light": "media/kotonoha.svg",
+          "dark": "media/kotonoha.svg"
+        }
+      },
+      {
+        "command": "kotonoha.focusContext",
+        "title": "Kotonoha: Open Context Panel",
+        "icon": "$(list-unordered)"
+      },
+      {
+        "command": "kotonoha.focusMeaningDelta",
+        "title": "Kotonoha: Open Meaning Delta Panel",
+        "icon": "$(add)"
+      },
+      {
+        "command": "kotonoha.focusRdeReview",
+        "title": "Kotonoha: Open RDE & Review Panel",
+        "icon": "$(checklist)"
+      },
+      {
         "command": "kotonoha.refreshContext",
         "title": "Kotonoha: Refresh Context",
         "icon": "$(refresh)"
@@ -102,12 +125,92 @@
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "kotonoha.openActivity",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+alt+k"
+      },
+      {
+        "command": "kotonoha.focusContext",
+        "key": "ctrl+alt+shift+c",
+        "mac": "cmd+alt+shift+c"
+      },
+      {
+        "command": "kotonoha.focusMeaningDelta",
+        "key": "ctrl+alt+shift+m",
+        "mac": "cmd+alt+shift+m"
+      },
+      {
+        "command": "kotonoha.focusRdeReview",
+        "key": "ctrl+alt+shift+r",
+        "mac": "cmd+alt+shift+r"
+      },
+      {
+        "command": "kotonoha.registerMeaningDelta",
+        "key": "ctrl+alt+shift+d",
+        "mac": "cmd+alt+shift+d"
+      }
+    ],
     "menus": {
       "view/title": [
         {
+          "command": "kotonoha.openActivity",
+          "when": "view == kotonoha.context || view == kotonoha.meaningDelta || view == kotonoha.rdeReview",
+          "group": "navigation@0"
+        },
+        {
           "command": "kotonoha.refreshContext",
           "when": "view == kotonoha.context",
-          "group": "navigation"
+          "group": "navigation@1"
+        },
+        {
+          "command": "kotonoha.focusContext",
+          "when": "view == kotonoha.meaningDelta || view == kotonoha.rdeReview",
+          "group": "navigation@1"
+        },
+        {
+          "command": "kotonoha.registerMeaningDelta",
+          "when": "view == kotonoha.meaningDelta",
+          "group": "navigation@2"
+        },
+        {
+          "command": "kotonoha.focusMeaningDelta",
+          "when": "view == kotonoha.context || view == kotonoha.rdeReview",
+          "group": "navigation@2"
+        },
+        {
+          "command": "kotonoha.attachRde",
+          "when": "view == kotonoha.rdeReview",
+          "group": "navigation@2"
+        },
+        {
+          "command": "kotonoha.focusRdeReview",
+          "when": "view == kotonoha.context || view == kotonoha.meaningDelta",
+          "group": "navigation@3"
+        },
+        {
+          "command": "kotonoha.copyExport",
+          "when": "view == kotonoha.rdeReview",
+          "group": "navigation@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "kotonoha.openActivity",
+          "when": "true"
+        },
+        {
+          "command": "kotonoha.focusContext",
+          "when": "true"
+        },
+        {
+          "command": "kotonoha.focusMeaningDelta",
+          "when": "true"
+        },
+        {
+          "command": "kotonoha.focusRdeReview",
+          "when": "true"
         }
       ]
     }
