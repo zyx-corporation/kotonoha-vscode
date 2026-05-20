@@ -94,6 +94,9 @@ Mark each item when verified in the **Extension Development Host**.
 | `record-review` | ReviewDecision を UI から記録できる | **Approve** (or Hold/Reject). Success message. Banner: *RDE does not substitute for human judgment.* | [ ] |
 | `cli-errors` | Kotonoha Core（CLI 経由）と通信でき、エラーがユーザーに伝わる | Clear `kotonoha.databaseUrl` → Register ΔM → error text (env / exit 1). Restore URL. Invalid review without ΔM → error. | [ ] |
 | `readme` | README にインストール・設定・M1 デモとの関係が書かれている | Skim [README.md](../README.md): install, settings, acceptance link, CLI compatibility. | [ ] |
+| `i18n-ja` | UI 多言語化（日本語） | Set VS Code display language to **日本語**. Repeat `git-context` → `register-delta` → `show-rde` → `record-review` in Japanese UI. No missing-key placeholders. | [ ] |
+| `i18n-en` | UI 多言語化（英語） | Set display language to **English**. Repeat the same four operations in English UI. | [ ] |
+| `design-review` | UI デザイン評価 | Complete D1〜D5 per [management `32` §2.2](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/32_milestone_ui_quality_gates_draft.md). Record in `docs/ui-design-review-m3.md` or [#104](https://github.com/zyx-corporation/kotonoha-management/issues/104). Judgment: Pass or Pass with notes. | [ ] |
 
 Programmatic mirror (drift guard): `src/m3AcceptanceChecklist.ts` + `npm test`.
 
@@ -132,7 +135,7 @@ M3 does **not** replace CLI acceptance; it adds a **human UI path** over the sam
 
 ## Sign-off
 
-When all six rows are checked:
+When all **nine** rows are checked:
 
 1. Record date and `kotonoha --version` in a PR or #104 comment.
 2. Close [management#112](https://github.com/zyx-corporation/kotonoha-management/issues/112).
@@ -145,3 +148,4 @@ When all six rows are checked:
 | Date | Change |
 | --- | --- |
 | 2026-05-20 | Initial M3-d procedure |
+| 2026-05-20 | Gate rows `i18n-ja`, `i18n-en`, `design-review`（[`32`](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/32_milestone_ui_quality_gates_draft.md)） |

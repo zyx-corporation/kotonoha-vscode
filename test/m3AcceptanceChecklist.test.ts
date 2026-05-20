@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { M3_GATE_CHECKLIST } from "../dist/m3AcceptanceChecklist";
 
 describe("M3_GATE_CHECKLIST", () => {
-  it("has six items matching spec §6 (invariant)", () => {
-    assert.equal(M3_GATE_CHECKLIST.length, 6);
+  it("has nine items matching spec §6 + UI quality gates (invariant)", () => {
+    assert.equal(M3_GATE_CHECKLIST.length, 9);
   });
 
   it("uses unique ids (negative)", () => {
@@ -20,5 +20,7 @@ describe("M3_GATE_CHECKLIST", () => {
     assert.match(text, /ReviewDecision/);
     assert.match(text, /CLI/);
     assert.match(text, /README/);
+    assert.match(text, /多言語化/);
+    assert.match(text, /デザイン評価/);
   });
 });
