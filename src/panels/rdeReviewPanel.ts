@@ -1,8 +1,9 @@
 import * as vscode from "vscode";
 import { runCliOrThrow } from "../cli";
 import { getConfig } from "../config";
+import { getPanelLocale, translateIssue, t } from "../i18n";
 import {
-  HUMAN_JUDGMENT_BANNER,
+  HUMAN_JUDGMENT_BANNER_KEY,
   buildExportArgs,
   buildRdeAttachArgs,
   buildReviewArgs,
@@ -13,7 +14,7 @@ import {
   validateReviewPreconditions,
 } from "../rdeReviewContract";
 import { session } from "../state";
-import { requireWorkspaceMessage } from "../workspace";
+import { requireWorkspaceIssue } from "../workspace";
 import { escapeHtml } from "../util/escapeHtml";
 import { webviewShell } from "../webview/html";
 
@@ -58,6 +59,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     message?: string,
     isError?: boolean
   ): void {
+    const locale = getPanelLocale();
     const delta = session.lastDeltaId ?? "— (register ΔM first)";
     const summary = this.lastExportSummary;
     const warnBlock =
@@ -66,7 +68,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
         : "";
     const reviewBlock =
       summary?.humanReviewRequired
-        ? `<p class="warn">Human review required — no ReviewDecision yet.</p>`
+        ? `<p class="warn">${escapeHtml(t(locale, "rde.humanReviewRequiredPanel"))}</p>`
         : "";
 
     webview.html = webviewShell(
@@ -84,14 +86,14 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
   </div>
   <h2>Review</h2>
   <div class="card">
-    <p class="warn">${escapeHtml(HUMAN_JUDGMENT_BANNER)}</p>
+    <p class="warn">${escapeHtml(t(locale, HUMAN_JUDGMENT_BANNER_KEY))}</p>
     <button onclick="review('approve')">Approve</button>
     <button class="secondary" onclick="review('hold')">Hold</button>
     <button class="secondary" onclick="review('reject')">Reject</button>
     <button class="secondary" onclick="exportM2()">Copy export (m2)</button>
   </div>
   ${exportPreview ? `<h2>Export preview</h2><pre class="card" style="white-space:pre-wrap;font-size:10px;max-height:200px;overflow:auto">${escapeHtml(exportPreview)}</pre>` : ""}
-  ${message ? `<p class="${isError ? "error" : "ok"}">${escapeHtml(message)}</p>` : ""}
+  ${message ? `<p class="${isError ? "error" : "ok"}">${escapeHtml(translateIssue(locale, message))}</p>` : ""}
   <script>
     const vscode = acquireVsCodeApi();
     function attach() { vscode.postMessage({ type: 'attach' }); }
@@ -108,7 +110,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     const preflight = validateRdeAttachPreconditions({
       databaseUrl: config.databaseUrl,
       deltaId: session.lastDeltaId,
-      workspaceReady: requireWorkspaceMessage() === null,
+      workspaceReady: requireWorkspaceIssue() === null,
     });
     if (preflight) {
       this.render(webview, undefined, preflight, true);
@@ -132,7 +134,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     const preflight = validateRdeAttachPreconditions({
       databaseUrl: config.databaseUrl,
       deltaId: session.lastDeltaId,
-      workspaceReady: requireWorkspaceMessage() === null,
+      workspaceReady: requireWorkspaceIssue() === null,
     });
     if (preflight) {
       this.render(webview, undefined, preflight, true);
@@ -172,7 +174,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
       databaseUrl: config.databaseUrl,
       deltaId: session.lastDeltaId,
       decision,
-      workspaceReady: requireWorkspaceMessage() === null,
+      workspaceReady: requireWorkspaceIssue() === null,
     });
     if (preflight) {
       this.render(webview, undefined, preflight, true);
@@ -204,6 +206,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     webview: vscode.Webview,
     message?: string
   ): Promise<void> {
+    const locale = getPanelLocale();
     if (!session.lastDeltaId) {
       this.render(webview, undefined, "Register a MeaningDelta first.", true);
       return;
@@ -213,8 +216,22 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
       const out = await runCliOrThrow(buildExportArgs(session.lastDeltaId));
       const parsed = JSON.parse(out) as unknown;
       this.lastExportSummary = summarizeM2Export(parsed);
+      const root = parsed as Record<string, unknown>;
+      const decisionCount = Array.isArray(root.review_decisions)
+        ? root.review_decisions.length
+        : 0;
+      if (decisionCount > 0) {
+        this.lastExportSummary.humanReviewRequired = false;
+      }
+      if (message && /^Review recorded:/i.test(message)) {
+        this.lastExportSummary.humanReviewRequired = false;
+      }
       const pretty = JSON.stringify(parsed, null, 2);
-      const preview = formatM2ExportPreview(this.lastExportSummary, pretty);
+      const preview = formatM2ExportPreview(
+        this.lastExportSummary,
+        pretty,
+        locale
+      );
       if (
         this.lastExportSummary.latestAssessmentId &&
         !session.lastAssessmentId
@@ -243,6 +260,13 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
   }
 
   private webviewRef?: vscode.Webview;
+
+  /** Re-render when Meaning Delta registration updates `session.lastDeltaId`. */
+  public refresh(): void {
+    if (this.webviewRef) {
+      this.render(this.webviewRef);
+    }
+  }
 
   public copyExport(): Promise<void> {
     return this.copyExportInternal();

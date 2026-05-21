@@ -3,8 +3,9 @@ import { buildStatusArgs } from "../cliArgs";
 import { runCli } from "../cli";
 import { parseStatus } from "../cliContract";
 import { getConfig } from "../config";
+import { getPanelLocale, t } from "../i18n";
 import { escapeHtml } from "../util/escapeHtml";
-import { getEditorRelFile, requireWorkspaceMessage } from "../workspace";
+import { getEditorRelFile, requireWorkspaceIssue } from "../workspace";
 import { webviewShell } from "../webview/html";
 
 export class ContextPanelProvider implements vscode.WebviewViewProvider {
@@ -41,6 +42,7 @@ export class ContextPanelProvider implements vscode.WebviewViewProvider {
   }
 
   public async render(webview: vscode.Webview): Promise<void> {
+    const locale = getPanelLocale();
     const editor = vscode.window.activeTextEditor;
     const config = getConfig();
     const relFile = getEditorRelFile(editor) || "—";
@@ -52,27 +54,31 @@ export class ContextPanelProvider implements vscode.WebviewViewProvider {
           ? `L${sel.start.line + 1}:${sel.start.character + 1}`
           : "—";
 
-    const wsMsg = requireWorkspaceMessage();
+    const wsIssue = requireWorkspaceIssue();
     let statusBlock = "";
-    let error = wsMsg ?? "";
+    let error = wsIssue ? t(locale, wsIssue) : "";
 
     if (!error) {
       try {
         const result = await runCli(buildStatusArgs(config.projectPath));
         if (result.code !== 0) {
-          error = result.stderr || `status exited ${result.code}`;
+          error =
+            result.stderr ||
+            t(locale, "context.statusExit", { code: result.code });
         } else {
           const s = parseStatus(result.stdout);
+          const row = (key: keyof typeof s, labelKey: Parameters<typeof t>[1]) =>
+            `<dt>${escapeHtml(t(locale, labelKey))}</dt><dd>${escapeHtml(s[key] ?? "—")}</dd>`;
           statusBlock = `
 <dl>
-  <dt>repository</dt><dd>${escapeHtml(s["repository"] ?? (config.projectPath || "—"))}</dd>
-  <dt>branch</dt><dd>${escapeHtml(s["branch"] ?? "—")}</dd>
-  <dt>commit</dt><dd>${escapeHtml(s["commit"] ?? "—")}</dd>
-  <dt>working tree</dt><dd>${escapeHtml(s["working tree"] ?? "—")}</dd>
-  <dt>database</dt><dd>${escapeHtml(s["database"] ?? "—")}</dd>
-  <dt>meaning_deltas</dt><dd>${escapeHtml(s["meaning_deltas"] ?? "—")}</dd>
-  <dt>project_id</dt><dd>${escapeHtml(s["project_id"] ?? "—")}</dd>
-  <dt>kotonoha init</dt><dd>${escapeHtml(s["kotonoha_init"] ?? "ok")}</dd>
+  ${row("repository", "context.status.repository")}
+  ${row("branch", "context.status.branch")}
+  ${row("commit", "context.status.commit")}
+  ${row("working tree", "context.status.workingTree")}
+  ${row("database", "context.status.database")}
+  ${row("meaning_deltas", "context.status.meaningDeltas")}
+  ${row("project_id", "context.status.projectId")}
+  <dt>${escapeHtml(t(locale, "context.status.kotonohaInit"))}</dt><dd>${escapeHtml(s["kotonoha_init"] ?? "ok")}</dd>
 </dl>`;
         }
       } catch (e) {
@@ -81,23 +87,24 @@ export class ContextPanelProvider implements vscode.WebviewViewProvider {
     }
 
     webview.html = webviewShell(
-      "Kotonoha Context",
+      t(locale, "context.pageTitle"),
       `
-  <h2>Current context</h2>
+  <h2>${escapeHtml(t(locale, "context.heading"))}</h2>
   <div class="card">
     <dl>
-      <dt>active file</dt><dd>${escapeHtml(relFile)}</dd>
-      <dt>selection</dt><dd>${escapeHtml(selection)}</dd>
+      <dt>${escapeHtml(t(locale, "context.activeFile"))}</dt><dd>${escapeHtml(relFile)}</dd>
+      <dt>${escapeHtml(t(locale, "context.selection"))}</dt><dd>${escapeHtml(selection)}</dd>
     </dl>
     ${statusBlock}
     ${error ? `<p class="error">${escapeHtml(error)}</p>` : ""}
-    <button onclick="refresh()">Refresh</button>
+    <button onclick="refresh()">${escapeHtml(t(locale, "context.refresh"))}</button>
   </div>
-  <p class="note">Git diff: use VS Code Source Control or <code>kotonoha diff</code>.</p>
+  <p class="note">${escapeHtml(t(locale, "context.gitDiffNote"))}</p>
   <script>
     const vscode = acquireVsCodeApi();
     function refresh() { vscode.postMessage({ type: 'refresh' }); }
-  </script>`
+  </script>`,
+      locale
     );
   }
 }

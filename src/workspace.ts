@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import type { MessageKey } from "./i18n/messages";
 import { relativeRepoFile } from "./workspacePath";
 
 export { relativeRepoFile } from "./workspacePath";
@@ -31,9 +32,9 @@ export function getEditorRelFile(editor?: vscode.TextEditor): string {
   return relativeRepoFile(folder.uri.fsPath, editor.document.uri.fsPath);
 }
 
-export function requireWorkspaceMessage(): string | null {
+export function requireWorkspaceIssue(): MessageKey | null {
   if (!vscode.workspace.workspaceFolders?.length) {
-    return "Open a folder workspace (Git repository) before using Kotonoha.";
+    return "preflight.workspaceRequired";
   }
   return null;
 }

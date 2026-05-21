@@ -10,7 +10,8 @@ import {
 } from "../meaningDeltaForm";
 import { escapeHtml } from "../util/escapeHtml";
 import { session } from "../state";
-import { getEditorRelFile, requireWorkspaceMessage } from "../workspace";
+import { getPanelLocale, translateIssue } from "../i18n";
+import { getEditorRelFile, requireWorkspaceIssue } from "../workspace";
 import { webviewShell } from "../webview/html";
 
 interface FormState {
@@ -28,7 +29,10 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
   private webview?: vscode.Webview;
   private lastForm: FormState = {};
 
-  constructor(private readonly extensionUri: vscode.Uri) {}
+  constructor(
+    private readonly extensionUri: vscode.Uri,
+    private readonly onDeltaRegistered?: () => void
+  ) {}
 
   resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -132,14 +136,18 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
     webview: vscode.Webview
   ): Promise<void> {
     const config = getConfig();
-    const ws = requireWorkspaceMessage();
+    const ws = requireWorkspaceIssue();
     const preflight = validateRegisterPreconditions({
       databaseUrl: config.databaseUrl,
       file: msg.file,
       workspaceReady: ws === null,
     });
     if (preflight) {
-      this.render(webview, preflight, true);
+      this.render(
+        webview,
+        translateIssue(getPanelLocale(), preflight),
+        true
+      );
       return;
     }
 
@@ -158,6 +166,7 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
       );
       const id = await runCliOrThrow(args);
       session.lastDeltaId = id;
+      this.onDeltaRegistered?.();
       this.render(webview, `Registered meaning delta: ${id}`);
       vscode.window.showInformationMessage(`Kotonoha: MeaningDelta ${id}`);
     } catch (e) {

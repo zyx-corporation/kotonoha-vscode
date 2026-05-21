@@ -105,32 +105,32 @@ describe("parseReviewDecision", () => {
 
 describe("validateRdeAttachPreconditions", () => {
   it("blocks without database URL (exit 1 equivalent)", () => {
-    assert.match(
-      validateRdeAttachPreconditions({ databaseUrl: "", deltaId: "x" })!,
-      /databaseUrl/i
+    assert.equal(
+      validateRdeAttachPreconditions({ databaseUrl: "", deltaId: "x" }),
+      "preflight.databaseUrlAttach"
     );
   });
 
   it("blocks without delta id (negative)", () => {
-    assert.match(
+    assert.equal(
       validateRdeAttachPreconditions({
         databaseUrl: "postgres://x",
         deltaId: null,
-      })!,
-      /MeaningDelta/i
+      }),
+      "preflight.deltaRequired"
     );
   });
 });
 
 describe("validateReviewPreconditions", () => {
   it("requires valid decision subcommand (negative)", () => {
-    assert.match(
+    assert.equal(
       validateReviewPreconditions({
         databaseUrl: "postgres://x",
         deltaId: "d",
         decision: "invalid",
-      })!,
-      /decision/i
+      }),
+      "preflight.unknownDecision"
     );
   });
 });
@@ -173,6 +173,7 @@ describe("formatM2ExportPreview", () => {
     const text = formatM2ExportPreview(
       summarizeM2Export(SAMPLE_M2),
       JSON.stringify(SAMPLE_M2, null, 2),
+      "en",
       500
     );
     assert.match(text, /Human review required/i);

@@ -29,7 +29,7 @@ echo "# M3 demo $(date -u +%Y-%m-%dT%H:%M:%SZ)" >"$DEMO_FILE"
 OBS="${M3_DEMO_OBSERVATION:-/tmp/m3_observation.json}"
 echo '{"intended_change":"M3 acceptance","preserved":["intent"]}' >"$OBS"
 
-DELTA=$("$KO" delta create "$DEMO_FILE" "$OBS")
+DELTA=$("$KO" delta create "$DEMO_FILE" --observation "$OBS")
 echo "meaning_delta_id: $DELTA"
 
 ASSESSMENT=$("$KO" rde emit | "$KO" rde attach --delta-id "$DELTA" --source-kind cli)

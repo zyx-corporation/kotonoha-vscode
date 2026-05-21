@@ -13,7 +13,7 @@ export function buildDeltaCreateArgs(
     args.push("--line-end", String(lineEnd));
   }
   if (observationFilePath) {
-    args.push(observationFilePath);
+    args.push("--observation", observationFilePath);
   }
   return args;
 }
