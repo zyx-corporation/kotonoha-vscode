@@ -11,7 +11,7 @@ describe("validateRegisterPreconditions", () => {
   it("requires database URL (maps to CLI exit 1 / env)", () => {
     assert.equal(
       validateRegisterPreconditions({ databaseUrl: "", file: "a.md" }),
-      "Set kotonoha.databaseUrl (or DATABASE_URL) before registering."
+      "preflight.databaseUrlRegister"
     );
   });
 
@@ -21,18 +21,18 @@ describe("validateRegisterPreconditions", () => {
         databaseUrl: "postgres://x",
         file: "",
       }),
-      "Open a file inside the workspace folder (not an out-of-workspace path)."
+      "preflight.fileRequired"
     );
   });
 
   it("requires workspace folder (negative)", () => {
-    assert.match(
+    assert.equal(
       validateRegisterPreconditions({
         databaseUrl: "postgres://x",
         file: "a.md",
         workspaceReady: false,
-      })!,
-      /folder workspace/i
+      }),
+      "preflight.workspaceRequired"
     );
   });
 

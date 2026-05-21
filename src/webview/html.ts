@@ -1,6 +1,10 @@
-export function webviewShell(title: string, body: string): string {
+export function webviewShell(
+  title: string,
+  body: string,
+  lang = "en"
+): string {
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';" />

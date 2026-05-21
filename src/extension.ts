@@ -15,8 +15,11 @@ async function focusKotonohaView(viewId: string): Promise<void> {
 
 export function activate(context: vscode.ExtensionContext): void {
   const contextPanel = new ContextPanelProvider(context.extensionUri);
-  const meaningDeltaPanel = new MeaningDeltaPanelProvider(context.extensionUri);
   const rdeReviewPanel = new RdeReviewPanelProvider();
+  const meaningDeltaPanel = new MeaningDeltaPanelProvider(
+    context.extensionUri,
+    () => rdeReviewPanel.refresh()
+  );
 
   const refreshEditorContext = (): void => {
     contextPanel.refresh();

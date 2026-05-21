@@ -22,6 +22,7 @@ describe("buildDeltaCreateArgs", () => {
         "12",
         "--line-end",
         "18",
+        "--observation",
         "/tmp/obs.json",
       ]
     );

@@ -1,7 +1,27 @@
 /** RDE attach / review / export CLI contracts (M3-c; unit-tested). */
 
-export const HUMAN_JUDGMENT_BANNER =
-  "RDE does not substitute for human judgment.";
+import type { Locale, MessageKey } from "./i18n/messages";
+import { messages } from "./i18n/messages";
+
+function t(
+  locale: Locale,
+  key: MessageKey,
+  params?: Record<string, string | number>
+): string {
+  const table = messages[locale] ?? messages.en;
+  let text: string = table[key] ?? messages.en[key] ?? key;
+  if (params) {
+    for (const [name, value] of Object.entries(params)) {
+      text = text.replaceAll(`{${name}}`, String(value));
+    }
+  }
+  return text;
+}
+
+export const HUMAN_JUDGMENT_BANNER_KEY = "rde.humanJudgmentBanner" as const;
+
+/** English invariant string (tests; CLI human-responsibility wording). */
+export const HUMAN_JUDGMENT_BANNER = messages.en[HUMAN_JUDGMENT_BANNER_KEY];
 
 export type ReviewDecision = "approve" | "hold" | "reject";
 export type RdeSourceKind = "cli" | "llm" | "import" | "replay";
@@ -66,15 +86,15 @@ export function validateRdeAttachPreconditions(opts: {
   databaseUrl: string;
   deltaId: string | null | undefined;
   workspaceReady?: boolean;
-}): string | null {
+}): MessageKey | null {
   if (opts.workspaceReady === false) {
-    return "Open a folder workspace (Git repository) before using Kotonoha.";
+    return "preflight.workspaceRequired";
   }
   if (!opts.databaseUrl?.trim()) {
-    return "Set kotonoha.databaseUrl (or DATABASE_URL) before attaching RDE.";
+    return "preflight.databaseUrlAttach";
   }
   if (!opts.deltaId?.trim()) {
-    return "Register a MeaningDelta first.";
+    return "preflight.deltaRequired";
   }
   return null;
 }
@@ -84,17 +104,18 @@ export function validateReviewPreconditions(opts: {
   deltaId: string | null | undefined;
   decision: string;
   workspaceReady?: boolean;
-}): string | null {
-  const base = validateRdeAttachPreconditions({
-    databaseUrl: opts.databaseUrl,
-    deltaId: opts.deltaId,
-    workspaceReady: opts.workspaceReady,
-  });
-  if (base) {
-    return base.replace("attaching RDE", "recording review");
+}): MessageKey | null {
+  if (opts.workspaceReady === false) {
+    return "preflight.workspaceRequired";
+  }
+  if (!opts.databaseUrl?.trim()) {
+    return "preflight.databaseUrlReview";
+  }
+  if (!opts.deltaId?.trim()) {
+    return "preflight.deltaRequired";
   }
   if (!parseReviewDecision(opts.decision)) {
-    return "Unknown review decision.";
+    return "preflight.unknownDecision";
   }
   return null;
 }
@@ -166,23 +187,32 @@ export function truncatePreview(text: string, maxLen: number): string {
 export function formatM2ExportPreview(
   summary: M2ExportSummary,
   prettyJson: string,
+  locale: Locale = "en",
   maxLen = 1200
 ): string {
   const lines: string[] = [];
   if (summary.summaryParagraph) {
-    lines.push(`Summary: ${summary.summaryParagraph}`);
+    lines.push(
+      t(locale, "export.previewSummary", { text: summary.summaryParagraph })
+    );
   }
   if (summary.humanReviewRequired) {
-    lines.push("⚠ Human review required (no ReviewDecision recorded).");
+    lines.push(t(locale, "export.previewHumanReview"));
   }
   if (summary.validationWarnings.length > 0) {
     lines.push(
-      `Validation warnings (${summary.validationWarnings.length}): ${summary.validationWarnings.join("; ")}`
+      t(locale, "export.previewValidationWarnings", {
+        count: summary.validationWarnings.length,
+        warnings: summary.validationWarnings.join("; "),
+      })
     );
   }
   if (summary.latestAssessmentId) {
     lines.push(
-      `Latest RDE: ${summary.latestAssessmentId} · source_kind=${summary.latestSourceKind ?? "—"}`
+      t(locale, "export.previewLatestRde", {
+        id: summary.latestAssessmentId,
+        kind: summary.latestSourceKind ?? "—",
+      })
     );
   }
   lines.push("");

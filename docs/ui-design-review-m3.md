@@ -4,45 +4,49 @@
 
 **Wireframes:** [`ui-wireframes.md`](ui-wireframes.md)
 
-Fill this before closing [management#104](https://github.com/zyx-corporation/kotonoha-management/issues/104).
+**Parent:** [management#104](https://github.com/zyx-corporation/kotonoha-management/issues/104) · **Procedure:** [`m3_acceptance.md`](m3_acceptance.md)
 
 | Field | Value |
 | --- | --- |
-| **Date** | |
-| **Reviewer** | |
-| **Extension version** | |
-| **Judgment** | `Pass` / `Pass with notes` / `Revise` |
+| **Date** | 2026-05-21 |
+| **Reviewer** | F5 walkthrough (local) |
+| **Extension version** | 0.1.0 |
+| **CLI** | kotonoha 0.2.5 |
+| **Judgment** | **Pass with notes** |
 
 ## D1 — Information design
 
 | Result | Notes |
 | --- | --- |
-| | Context / ΔM / RDE / Review roles clear? |
+| **Pass** | Activity Bar **Kotonoha** with three panels: **Context** (Git / DB status), **Meaning Delta** (ΔM registration), **RDE & Review** (attach + review + export preview). Roles are distinguishable by panel title and content. |
 
 ## D2 — Operation flow
 
 | Result | Notes |
 | --- | --- |
-| | Register → attach → review within three panels? |
+| **Pass** | Recommended E2E completes within three panels: Context (refresh) → Meaning Delta (register) → RDE & Review (paste RDE → refresh preview → approve). No fourth panel required. |
 
 ## D3 — Accountability boundary
 
 | Result | Notes |
 | --- | --- |
-| | Human-responsibility / RDE≠final judgment visible? |
+| **Pass** | Human-judgment banner on RDE & Review panel (`rde.humanJudgmentBanner` / en+ja). Export summary states RDE does not replace final judgment. |
 
 ## D4 — Error experience
 
 | Result | Notes |
 | --- | --- |
-| | Failures explain next action (env / validation / DB)? |
+| **Pass with notes** | Empty `kotonoha.databaseUrl` shows preflight message in Meaning Delta panel (B5). CLI may still succeed if parent process sets `DATABASE_URL` (documented in acceptance notes). Invalid review without ΔM shows preflight error. |
 
 ## D5 — Wireframe alignment
 
 | Result | Notes |
 | --- | --- |
-| | Intentional deltas vs wireframes listed? |
+| **Pass with notes** | Intentional deltas: (1) Meaning Delta form labels partly English in `ja` locale; (2) RDE panel ΔM line not auto-refreshed after Register — use **Refresh export preview** or re-open panel (fix in progress locally); (3) `kotonoha init: not initialized` shown in Context — informational, not M3 gate. |
 
 ## Follow-up issues (if Pass with notes)
 
-- 
+- RDE panel: sync `session.lastDeltaId` to webview on Register (local fix drafted).
+- RDE panel: clear `humanReviewRequired` banner after Approve when export contains `review_decisions` (local fix drafted).
+- `cliEnv`: document or tighten `DATABASE_URL` fallback when `kotonoha.databaseUrl` is empty (B5 / ops).
+- Optional: `kotonoha init` stub or hide until M6.
