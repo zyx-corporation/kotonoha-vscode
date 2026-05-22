@@ -30,6 +30,8 @@ M2 features (`rde attach --source-kind`, `export --format m2`) require these min
 | `kotonoha.projectPath` | Repo root (default: workspace folder) |
 | `kotonoha.databaseUrl` | PostgreSQL URL (**do not commit**) |
 | `kotonoha.decidedBy` | Default identity for review decisions |
+| `kotonoha.principalId` | M7: principal UUID → `KOTONOHA_PRINCIPAL_ID` on CLI child processes |
+| `kotonoha.projectId` | M7: project UUID → `KOTONOHA_PROJECT_ID` for scoped export / writes |
 
 ## Install (development)
 
