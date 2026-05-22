@@ -38,6 +38,16 @@
           "type": "string",
           "default": "",
           "description": "Default identity for review decisions."
+        },
+        "kotonoha.principalId": {
+          "type": "string",
+          "default": "",
+          "description": "M6/M7 principal UUID (KOTONOHA_PRINCIPAL_ID for CLI child processes)."
+        },
+        "kotonoha.projectId": {
+          "type": "string",
+          "default": "",
+          "description": "M6/M7 project UUID (KOTONOHA_PROJECT_ID for scoped export and writes)."
         }
       }
     },

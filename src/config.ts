@@ -12,5 +12,7 @@ export function getConfig(): KotonohaConfig {
     projectPath: getProjectRoot(vscode.window.activeTextEditor),
     databaseUrl: cfg.get<string>("databaseUrl", ""),
     decidedBy: cfg.get<string>("decidedBy", ""),
+    principalId: cfg.get<string>("principalId", ""),
+    projectId: cfg.get<string>("projectId", ""),
   };
 }
