@@ -10,17 +10,17 @@ Semantic lineage workspace for **MeaningDelta**, **RDE assessments**, and **huma
 ## Prerequisites
 
 - VS Code **1.85+** (or Cursor)
-- [`kotonoha` CLI](https://github.com/zyx-corporation/kotonoha-cli) **≥ 0.2.4** on `PATH`
-- [`kotonoha-core`](https://github.com/zyx-corporation/kotonoha-core) **≥ 0.1.9** (via CLI)
+- [`kotonoha` CLI](https://github.com/zyx-corporation/kotonoha-cli) **≥ 0.2.9** on `PATH`
+- [`kotonoha-core`](https://github.com/zyx-corporation/kotonoha-core) revision with Phase 1 `source_context_status` closed-vocabulary validation (via CLI)
 - PostgreSQL + `DATABASE_URL` for register / attach / review
 
 ### CLI compatibility
 
 | Extension | `kotonoha` CLI | `kotonoha-core` |
 | --- | --- | --- |
-| 0.1.x (M3) | ≥ 0.2.4 | ≥ 0.1.9 |
+| 0.1.x (M3) | ≥ 0.2.9 | revision with `source_context_status` validation |
 
-M2 features (`rde attach --source-kind`, `export --format m2`) require these minimums.
+M2 features (`rde attach --source-kind`, `export --format m2`) and current Phase 1 RDE validation require these minimums.
 
 ## Settings
 
@@ -30,8 +30,8 @@ M2 features (`rde attach --source-kind`, `export --format m2`) require these min
 | `kotonoha.projectPath` | Repo root (default: workspace folder) |
 | `kotonoha.databaseUrl` | PostgreSQL URL (**do not commit**) |
 | `kotonoha.decidedBy` | Default identity for review decisions |
-| `kotonoha.principalId` | M7: principal UUID → `KOTONOHA_PRINCIPAL_ID` on CLI child processes |
-| `kotonoha.projectId` | M7: project UUID → `KOTONOHA_PROJECT_ID` for scoped export / writes |
+| `kotonoha.principalId` | M6/M7: principal UUID → `KOTONOHA_PRINCIPAL_ID` on CLI child processes |
+| `kotonoha.projectId` | M6/M7: project UUID → `KOTONOHA_PROJECT_ID` for scoped export / writes |
 
 ## Install (development)
 
