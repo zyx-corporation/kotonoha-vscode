@@ -38,6 +38,18 @@ export function t(
   return text;
 }
 
+/** Map common CLI stderr (RBAC, etc.) to panel messages. */
+export function translateCliText(locale: Locale, raw: string): string {
+  const text = raw.toLowerCase();
+  if (text.includes("lacks role") && text.includes("reviewer")) {
+    return t(locale, "error.rbacNeedReviewer");
+  }
+  if (text.includes("lacks role") && text.includes("agent_runner")) {
+    return t(locale, "error.rbacNeedAgentRunner");
+  }
+  return raw;
+}
+
 /** Translate a preflight key or pass through unknown CLI text. */
 export function translateIssue(
   locale: Locale,
@@ -46,5 +58,5 @@ export function translateIssue(
   if (issue in messages.en) {
     return t(locale, issue as MessageKey);
   }
-  return issue;
+  return translateCliText(locale, issue);
 }

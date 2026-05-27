@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { runCliOrThrow } from "../cli";
 import { getConfig } from "../config";
 import { buildDeltaCreateArgs } from "../deltaCreateArgs";
+import { getPanelLocale, t, translateIssue } from "../i18n";
 import {
   buildObservationFromForm,
   computeLineAnchor,
@@ -10,7 +11,6 @@ import {
 } from "../meaningDeltaForm";
 import { escapeHtml } from "../util/escapeHtml";
 import { session } from "../state";
-import { getPanelLocale, translateIssue } from "../i18n";
 import { getEditorRelFile, requireWorkspaceIssue } from "../workspace";
 import { webviewShell } from "../webview/html";
 
@@ -69,6 +69,7 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
     message?: string,
     isError?: boolean
   ): void {
+    const locale = getPanelLocale();
     const editor = vscode.window.activeTextEditor;
     const relFile = getEditorRelFile(editor);
     const sel = editor?.selection;
@@ -78,28 +79,39 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
       Boolean(sel && !sel.isEmpty)
     );
     const f = this.lastForm;
+    const anchor = t(locale, "meaningDelta.anchor", {
+      file: relFile || "—",
+      lineStart: lineStart ?? "?",
+      lineEnd: lineEnd ?? "?",
+    });
+    const lastDeltaBlock = session.lastDeltaId
+      ? `<p class="ok">${escapeHtml(t(locale, "meaningDelta.lastDelta", { id: session.lastDeltaId }))}</p>`
+      : "";
+    const statusBlock = message
+      ? `<p class="${isError ? "error" : "ok"}">${escapeHtml(message)}</p>`
+      : "";
 
     webview.html = webviewShell(
-      "Meaning Delta",
+      t(locale, "meaningDelta.pageTitle"),
       `
-  <h2>Meaning delta (ΔM)</h2>
+  <h2>${escapeHtml(t(locale, "meaningDelta.heading"))}</h2>
   <div class="card">
-    <label for="intended">Intended change (SHOULD)</label>
-    <textarea id="intended" placeholder="What meaning change do you intend?">${escapeHtml(f.intended ?? "")}</textarea>
-    <label for="preserved">Preserved (comma-separated, optional)</label>
-    <input id="preserved" value="${escapeHtml(f.preservedCsv ?? "")}" placeholder="intent, scope" />
-    <label for="lost">Lost (optional)</label>
+    <label for="intended">${escapeHtml(t(locale, "meaningDelta.intendedLabel"))}</label>
+    <textarea id="intended" placeholder="${escapeHtml(t(locale, "meaningDelta.intendedPlaceholder"))}">${escapeHtml(f.intended ?? "")}</textarea>
+    <label for="preserved">${escapeHtml(t(locale, "meaningDelta.preservedLabel"))}</label>
+    <input id="preserved" value="${escapeHtml(f.preservedCsv ?? "")}" placeholder="${escapeHtml(t(locale, "meaningDelta.preservedPlaceholder"))}" />
+    <label for="lost">${escapeHtml(t(locale, "meaningDelta.lostLabel"))}</label>
     <input id="lost" value="${escapeHtml(f.lost ?? "")}" />
-    <label for="transformed">Transformed (optional)</label>
+    <label for="transformed">${escapeHtml(t(locale, "meaningDelta.transformedLabel"))}</label>
     <input id="transformed" value="${escapeHtml(f.transformed ?? "")}" />
-    <label for="unresolved">Unresolved (optional)</label>
+    <label for="unresolved">${escapeHtml(t(locale, "meaningDelta.unresolvedLabel"))}</label>
     <input id="unresolved" value="${escapeHtml(f.unresolved ?? "")}" />
-    <label for="drift">Drift (optional)</label>
+    <label for="drift">${escapeHtml(t(locale, "meaningDelta.driftLabel"))}</label>
     <input id="drift" value="${escapeHtml(f.drift ?? "")}" />
-    <p class="note">Anchor: ${escapeHtml(relFile || "—")} · lines ${lineStart ?? "?"}–${lineEnd ?? "?"}</p>
-    <button onclick="register()">Register ΔM</button>
-    ${session.lastDeltaId ? `<p class="ok">Last ΔM: ${escapeHtml(session.lastDeltaId)}</p>` : ""}
-    ${message ? `<p class="${isError ? "error" : "ok"}">${escapeHtml(message)}</p>` : ""}
+    <p class="note">${escapeHtml(anchor)}</p>
+    <button onclick="register()">${escapeHtml(t(locale, "meaningDelta.register"))}</button>
+    ${lastDeltaBlock}
+    ${statusBlock}
   </div>
   <script>
     const vscode = acquireVsCodeApi();
@@ -117,7 +129,8 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
         lineEnd: ${lineEnd !== null ? lineEnd : "null"},
       });
     }
-  </script>`
+  </script>`,
+      locale === "ja" ? "ja" : "en"
     );
   }
 
@@ -135,6 +148,7 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
     },
     webview: vscode.Webview
   ): Promise<void> {
+    const locale = getPanelLocale();
     const config = getConfig();
     const ws = requireWorkspaceIssue();
     const preflight = validateRegisterPreconditions({
@@ -143,11 +157,7 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
       workspaceReady: ws === null,
     });
     if (preflight) {
-      this.render(
-        webview,
-        translateIssue(getPanelLocale(), preflight),
-        true
-      );
+      this.render(webview, translateIssue(locale, preflight), true);
       return;
     }
 
@@ -167,11 +177,14 @@ export class MeaningDeltaPanelProvider implements vscode.WebviewViewProvider {
       const id = await runCliOrThrow(args);
       session.lastDeltaId = id;
       this.onDeltaRegistered?.();
-      this.render(webview, `Registered meaning delta: ${id}`);
-      vscode.window.showInformationMessage(`Kotonoha: MeaningDelta ${id}`);
+      const okMsg = t(locale, "meaningDelta.registered", { id });
+      this.render(webview, okMsg);
+      vscode.window.showInformationMessage(
+        t(locale, "notify.meaningDeltaRegistered", { id })
+      );
     } catch (e) {
       const text = e instanceof Error ? e.message : String(e);
-      this.render(webview, text, true);
+      this.render(webview, translateIssue(locale, text), true);
     } finally {
       if (obsPath) {
         await vscode.workspace.fs.delete(vscode.Uri.file(obsPath));

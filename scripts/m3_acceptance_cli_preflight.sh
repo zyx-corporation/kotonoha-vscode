@@ -4,7 +4,7 @@
 #   ./scripts/m3_acceptance_cli_preflight.sh [PATH_TO_KOTONOHA_BINARY]
 #
 # Requires: DATABASE_URL, Git repo cwd
-# See: docs/m3_acceptance.md
+# See: docs/m3_acceptance.md · docs/m3_acceptance_ja.md
 set -euo pipefail
 
 KO="${1:-${KOTONOHA_BIN:-kotonoha}}"
@@ -41,4 +41,4 @@ echo "review_decision_id: $DECISION"
 echo "export m2 (first 20 lines):"
 "$KO" export --delta-id "$DELTA" --format m2 | head -n 20
 
-echo "== M3 CLI preflight OK — continue with docs/m3_acceptance.md (F5 UI) =="
+echo "== M3 CLI preflight OK — continue with docs/m3_acceptance.md or docs/m3_acceptance_ja.md (F5 UI) =="

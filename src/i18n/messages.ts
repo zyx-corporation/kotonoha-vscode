@@ -60,6 +60,8 @@ export const messages = {
     "rde.attached": "Attached RDE: {id}",
     "rde.reviewRecorded": "Review recorded: {id}",
     "rde.clipboardEmpty": "Clipboard is empty.",
+    "rde.invalidJson":
+      "Attach input is not valid JSON. Run `kotonoha rde emit` and paste that output (not note.md or other text).",
 
     "export.previewSummary": "Summary: {text}",
     "export.previewHumanReview":
@@ -90,6 +92,11 @@ export const messages = {
 
     "error.noWorkspaceForObs":
       "No workspace folder for observation temp file.",
+    "error.rbacNeedAgentRunner":
+      "RBAC: switch DB role to agent_runner before Register ΔM / RDE attach (see m3_acceptance_ja.md).",
+    "error.rbacNeedReviewer":
+      "RBAC: switch DB role to reviewer before Approve (see m3_acceptance_ja.md). CLI failed; ReviewDecision was not saved.",
+
   },
   ja: {
     "context.pageTitle": "Kotonoha コンテキスト",
@@ -147,6 +154,8 @@ export const messages = {
     "rde.attached": "RDE を添付しました: {id}",
     "rde.reviewRecorded": "レビューを記録しました: {id}",
     "rde.clipboardEmpty": "クリップボードが空です。",
+    "rde.invalidJson":
+      "添付内容が有効な JSON ではありません。`kotonoha rde emit` の出力を貼り付けてください（note.md などの本文は不可）。",
 
     "export.previewSummary": "要約: {text}",
     "export.previewHumanReview":
@@ -179,6 +188,10 @@ export const messages = {
 
     "error.noWorkspaceForObs":
       "観測用一時ファイルのワークスペースフォルダがありません。",
+    "error.rbacNeedAgentRunner":
+      "RBAC: Register ΔM / RDE attach の前に DB ロールを agent_runner に切り替えてください（m3_acceptance_ja.md 参照）。",
+    "error.rbacNeedReviewer":
+      "RBAC: Approve の前に DB ロールを reviewer に切り替えてください。失敗したため ReviewDecision は保存されていません。",
   },
 } as const;
 

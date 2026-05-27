@@ -1,0 +1,108 @@
+# T-RDE v1.0 L1 trace_map — kotonoha-vscode M3 Minimal UI
+# Normative guide (canonical): kotonoha-spec docs/T-RDE_v1.0.md §8 (L1), §7
+# M3 gate: management 29_m3_minimal_ui_spec_draft.md §6
+# Parent: https://github.com/zyx-corporation/kotonoha-management/issues/104
+
+trace_map:
+  version: "2026-05-27"
+  trde_version: "1.0"
+  guide: https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/T-RDE_v1.0.md
+  guide_repository: kotonoha-spec
+  domain: institutional_document
+  domain_selection_status: explicit
+  domain_note: >
+    意味監査・レビュー記録・RBAC を扱う IDE 拡張。
+    institutional_document を明示（provisional_general は高リスクのため不可 §2.4）。
+  project: kotonoha-vscode
+  milestone: M3
+
+  intents:
+    - id: I-git-context
+      description: "VS Code 上で Git 差分・選択・ブランチを Context パネルに表示"
+      implemented: true
+      mapped_to: "src/panels/contextPanel.ts, kotonoha status CLI"
+      confidence: 0.95
+      acceptance_gate: git-context
+
+    - id: I-register-delta
+      description: "選択範囲またはファイル単位で MeaningDelta を UI から登録"
+      implemented: true
+      mapped_to: "src/panels/meaningDeltaPanel.ts, kotonoha delta create"
+      confidence: 0.95
+      acceptance_gate: register-delta
+
+    - id: I-show-rde
+      description: "RDEAssessment を attach し export preview で validation_report を表示"
+      implemented: true
+      mapped_to: "src/panels/rdeReviewPanel.ts, kotonoha rde attach / export"
+      confidence: 0.9
+      acceptance_gate: show-rde
+
+    - id: I-record-review
+      description: "ReviewDecision を UI から記録し人間責任バナーを常時表示"
+      implemented: true
+      mapped_to: "src/panels/rdeReviewPanel.ts, HUMAN_JUDGMENT_BANNER_KEY"
+      confidence: 0.9
+      note: "RBAC reviewer ロール切替は手順・SQL 依存（ΔI）"
+      acceptance_gate: record-review
+
+    - id: I-cli-errors
+      description: "CLI 失敗・設定不足をパネル/トーストでユーザーに伝える"
+      implemented: true
+      mapped_to: >
+        meaningDeltaForm.validateRegisterPreconditions,
+        rdeReviewContract.validateReviewPreconditions,
+        m3_acceptance_ja.md cli-errors 手順
+      confidence: 0.9
+      note: "ΔM なし review は EDH 再起動で検証（セッション状態は文書化）"
+      acceptance_gate: cli-errors
+
+    - id: I-readme
+      description: "README にインストール・設定・M1/M2 デモとの関係"
+      implemented: true
+      mapped_to: "README.md"
+      confidence: 0.9
+      acceptance_gate: readme
+
+    - id: I-i18n
+      description: "主要操作の UI 多言語化（ja / en）"
+      implemented: true
+      mapped_to: "src/i18n/messages.ts, meaningDeltaPanel, rdeReviewPanel, contextPanel"
+      confidence: 0.9
+      acceptance_gate: [i18n-ja, i18n-en]
+
+    - id: I-design-review
+      description: "management 32 D1–D5 UI デザイン評価の記録"
+      implemented: true
+      mapped_to: "docs/ui-design-review-m3.md"
+      confidence: 0.9
+      acceptance_gate: design-review
+
+  unintended_features:
+    - description: "Extension Development Host セッション内のみ lastDeltaId を保持"
+      risk: medium
+      uncertainty_handled: true
+      note: "受け入れ手順で EDH 再起動を明記（#16）"
+
+    - description: "親プロセス DATABASE_URL — UI preflight とは別経路（B5）"
+      risk: low
+      uncertainty_handled: true
+      note: "README / cliEnv JSDoc で文書化（#17）"
+
+    - description: "Context に kotonoha init: not initialized 表示（M3 非目標）"
+      risk: low
+      uncertainty_handled: true
+
+  uncertainty_flags:
+    overconfidence_detected: false
+    missing_alternatives: false
+    high_risk_unhandled: false
+
+  # L1 向け共鳴条件の自己申告（L3 の SemanticMapV1 品質ゲートの手動近似 §7.1）
+  resonance_conditions:
+    semantic_alignment: true
+    uncertainty_calibration: true
+    value_coordination: true
+    repairability: true
+    resonance: true
+    reasons: []

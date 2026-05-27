@@ -229,6 +229,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "test": "npm run compile && tsc -p tsconfig.test.json && node --test out-test/*.test.js",
+    "test:e2e": "npm run compile && node test/e2e/run.cjs",
     "lint": "tsc -p ./ --noEmit",
     "vscode:prepublish": "npm run compile",
     "package": "vsce package --no-dependencies"
@@ -236,6 +237,7 @@
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^2.4.1",
     "typescript": "^5.4.0"
   }
 }

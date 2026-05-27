@@ -4,3 +4,5 @@ out-test/
 *.vsix
 .DS_Store
 .vscode-test/
+test/fixtures/minimal-workspace/.git/
+.vscode/settings.json

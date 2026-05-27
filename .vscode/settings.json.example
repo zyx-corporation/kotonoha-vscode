@@ -1,0 +1,4 @@
+{
+  "kotonoha.cliPath": "/Users/tomyuk/Projects/Kotonoha/kotonoha-cli/target/release/kotonoha",
+  "kotonoha.databaseUrl": "postgres://USER:PASSWORD@localhost:5432/kotonoha_test"
+}
