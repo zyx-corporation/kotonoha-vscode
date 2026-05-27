@@ -9,6 +9,13 @@ export interface KotonohaConfig {
   projectId: string;
 }
 
+/**
+ * Build env for CLI child processes.
+ *
+ * B5 (M3): When `kotonoha.databaseUrl` is empty, `DATABASE_URL` is **not** cleared —
+ * the parent process env is passed through. UI preflight blocks before CLI is invoked
+ * when the setting is empty; see `validateRegisterPreconditions` / README.
+ */
 export function cliEnv(config: KotonohaConfig): NodeJS.ProcessEnv {
   const env = { ...process.env };
   if (config.databaseUrl) {

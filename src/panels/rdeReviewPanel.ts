@@ -60,40 +60,57 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     isError?: boolean
   ): void {
     const locale = getPanelLocale();
-    const delta = session.lastDeltaId ?? "— (register ΔM first)";
+    const delta = session.lastDeltaId
+      ? t(locale, "rde.deltaLabel", { id: session.lastDeltaId })
+      : t(locale, "rde.deltaNone");
     const summary = this.lastExportSummary;
     const warnBlock =
       summary && summary.validationWarnings.length > 0
-        ? `<p class="warn">Strict / validation: ${escapeHtml(summary.validationWarnings.join("; "))}</p>`
+        ? `<p class="warn">${escapeHtml(
+            t(locale, "rde.validationWarnings", {
+              warnings: summary.validationWarnings.join("; "),
+            })
+          )}</p>`
         : "";
     const reviewBlock =
       summary?.humanReviewRequired
         ? `<p class="warn">${escapeHtml(t(locale, "rde.humanReviewRequiredPanel"))}</p>`
         : "";
+    const messageBlock = message
+      ? `<p class="${isError ? "error" : "ok"}">${escapeHtml(translateIssue(locale, message))}</p>`
+      : "";
+    const assessmentBlock = session.lastAssessmentId
+      ? `<p class="ok">${escapeHtml(
+          t(locale, "rde.lastAssessment", { id: session.lastAssessmentId })
+        )}</p>`
+      : "";
+    const exportBlock = exportPreview
+      ? `<h2>${escapeHtml(t(locale, "rde.headingExportPreview"))}</h2><pre class="card" style="white-space:pre-wrap;font-size:10px;max-height:200px;overflow:auto">${escapeHtml(exportPreview)}</pre>`
+      : "";
 
     webview.html = webviewShell(
-      "RDE & Review",
+      t(locale, "rde.pageTitle"),
       `
-  <h2>RDE assessment</h2>
+  <h2>${escapeHtml(t(locale, "rde.headingAssessment"))}</h2>
   <div class="card">
-    <p class="note">ΔM: <code>${escapeHtml(String(delta))}</code></p>
-    <button onclick="attach()">Attach RDE (pick JSON file)</button>
-    <button class="secondary" onclick="paste()">Paste RDE from clipboard</button>
-    <button class="secondary" onclick="refresh()">Refresh export preview</button>
-    ${session.lastAssessmentId ? `<p class="ok">Last assessment: ${escapeHtml(session.lastAssessmentId)}</p>` : ""}
+    <p class="note"><code>${escapeHtml(delta)}</code></p>
+    <button onclick="attach()">${escapeHtml(t(locale, "rde.attachFile"))}</button>
+    <button class="secondary" onclick="paste()">${escapeHtml(t(locale, "rde.pasteClipboard"))}</button>
+    <button class="secondary" onclick="refresh()">${escapeHtml(t(locale, "rde.refreshExport"))}</button>
+    ${assessmentBlock}
     ${warnBlock}
     ${reviewBlock}
   </div>
-  <h2>Review</h2>
+  <h2>${escapeHtml(t(locale, "rde.headingReview"))}</h2>
   <div class="card">
     <p class="warn">${escapeHtml(t(locale, HUMAN_JUDGMENT_BANNER_KEY))}</p>
-    <button onclick="review('approve')">Approve</button>
-    <button class="secondary" onclick="review('hold')">Hold</button>
-    <button class="secondary" onclick="review('reject')">Reject</button>
-    <button class="secondary" onclick="exportM2()">Copy export (m2)</button>
+    <button onclick="review('approve')">${escapeHtml(t(locale, "rde.approve"))}</button>
+    <button class="secondary" onclick="review('hold')">${escapeHtml(t(locale, "rde.hold"))}</button>
+    <button class="secondary" onclick="review('reject')">${escapeHtml(t(locale, "rde.reject"))}</button>
+    <button class="secondary" onclick="exportM2()">${escapeHtml(t(locale, "rde.copyExport"))}</button>
   </div>
-  ${exportPreview ? `<h2>Export preview</h2><pre class="card" style="white-space:pre-wrap;font-size:10px;max-height:200px;overflow:auto">${escapeHtml(exportPreview)}</pre>` : ""}
-  ${message ? `<p class="${isError ? "error" : "ok"}">${escapeHtml(translateIssue(locale, message))}</p>` : ""}
+  ${exportBlock}
+  ${messageBlock}
   <script>
     const vscode = acquireVsCodeApi();
     function attach() { vscode.postMessage({ type: 'attach' }); }
@@ -101,7 +118,8 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     function review(d) { vscode.postMessage({ type: 'review', decision: d }); }
     function exportM2() { vscode.postMessage({ type: 'export' }); }
     function refresh() { vscode.postMessage({ type: 'refresh' }); }
-  </script>`
+  </script>`,
+      locale === "ja" ? "ja" : "en"
     );
   }
 
@@ -143,18 +161,28 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
 
     const json = (await vscode.env.clipboard.readText()).trim();
     if (!json) {
-      this.render(webview, undefined, "Clipboard is empty.", true);
+      this.render(webview, undefined, "rde.clipboardEmpty", true);
       return;
     }
     await this.attachRdeJson(webview, json);
   }
 
   private async attachRdeJson(webview: vscode.Webview, json: string): Promise<void> {
+    const locale = getPanelLocale();
     const deltaId = session.lastDeltaId!;
+    try {
+      JSON.parse(json);
+    } catch {
+      this.render(webview, undefined, "rde.invalidJson", true);
+      return;
+    }
     try {
       const id = await runCliOrThrow(buildRdeAttachArgs(deltaId), json);
       session.lastAssessmentId = id;
-      await this.refreshExport(webview, `Attached RDE: ${id}`);
+      await this.refreshExport(
+        webview,
+        t(locale, "rde.attached", { id })
+      );
     } catch (e) {
       this.render(
         webview,
@@ -169,6 +197,7 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
     decision: string,
     webview: vscode.Webview
   ): Promise<void> {
+    const locale = getPanelLocale();
     const config = getConfig();
     const preflight = validateReviewPreconditions({
       databaseUrl: config.databaseUrl,
@@ -191,7 +220,10 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
 
     try {
       const id = await runCliOrThrow(args);
-      await this.refreshExport(webview, `Review recorded: ${id}`);
+      await this.refreshExport(
+        webview,
+        t(locale, "rde.reviewRecorded", { id })
+      );
     } catch (e) {
       this.render(
         webview,
@@ -208,7 +240,8 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
   ): Promise<void> {
     const locale = getPanelLocale();
     if (!session.lastDeltaId) {
-      this.render(webview, undefined, "Register a MeaningDelta first.", true);
+      this.lastExportSummary = undefined;
+      this.render(webview, undefined, "preflight.deltaRequired", true);
       return;
     }
 
@@ -221,9 +254,6 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
         ? root.review_decisions.length
         : 0;
       if (decisionCount > 0) {
-        this.lastExportSummary.humanReviewRequired = false;
-      }
-      if (message && /^Review recorded:/i.test(message)) {
         this.lastExportSummary.humanReviewRequired = false;
       }
       const pretty = JSON.stringify(parsed, null, 2);
@@ -250,10 +280,9 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
   }
 
   public async runReviewFromCommand(decision: string): Promise<void> {
+    const locale = getPanelLocale();
     if (!this.webviewRef) {
-      vscode.window.showWarningMessage(
-        "Kotonoha: open the RDE & Review panel first."
-      );
+      vscode.window.showWarningMessage(t(locale, "notify.openRdePanelFirst"));
       return;
     }
     await this.review(decision, this.webviewRef);
@@ -261,9 +290,15 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
 
   private webviewRef?: vscode.Webview;
 
-  /** Re-render when Meaning Delta registration updates `session.lastDeltaId`. */
+  /** Re-render and refresh export when Meaning Delta updates `session.lastDeltaId`. */
   public refresh(): void {
-    if (this.webviewRef) {
+    if (!this.webviewRef) {
+      return;
+    }
+    if (session.lastDeltaId) {
+      void this.refreshExport(this.webviewRef);
+    } else {
+      this.lastExportSummary = undefined;
       this.render(this.webviewRef);
     }
   }
@@ -273,19 +308,21 @@ export class RdeReviewPanelProvider implements vscode.WebviewViewProvider {
   }
 
   private async copyExportInternal(): Promise<void> {
+    const locale = getPanelLocale();
     if (!session.lastDeltaId) {
-      vscode.window.showErrorMessage("Kotonoha: register a MeaningDelta first.");
+      vscode.window.showErrorMessage(t(locale, "notify.registerDeltaFirst"));
       return;
     }
     try {
       const out = await runCliOrThrow(buildExportArgs(session.lastDeltaId));
       await vscode.env.clipboard.writeText(out);
-      vscode.window.showInformationMessage(
-        "Kotonoha: m2 export copied to clipboard."
-      );
+      vscode.window.showInformationMessage(t(locale, "notify.exportCopied"));
     } catch (e) {
       vscode.window.showErrorMessage(
-        e instanceof Error ? e.message : String(e)
+        translateIssue(
+          locale,
+          e instanceof Error ? e.message : String(e)
+        )
       );
     }
   }

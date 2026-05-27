@@ -12,14 +12,22 @@
 
 ```bash
 npm install
-npm test          # compile + node --test
+npm test          # compile + node --test (contracts, preflight)
+npm run test:e2e  # @vscode/test-electron smoke (Linux CI: xvfb)
 npm run lint      # tsc --noEmit
 ```
 
 ## スコープ
 
-- **単体:** `src/` の純粋関数（`parseStatus`, `buildDeltaCreateArgs`, `escapeHtml`, `cliEnv`, …）
-- **統合:** CLI 子プロセス・VS Code API は将来 `@vscode/test-electron` または手動 F5 で補う
+- **単体:** `src/` の純粋関数（`parseStatus`, `buildDeltaCreateArgs`, `escapeHtml`, `cliEnv`, preflight, …）
+- **E2E スモーク:** `test/e2e/` — 拡張のロード・コマンド登録・`databaseUrl` 空の preflight（[#19](https://github.com/zyx-corporation/kotonoha-vscode/issues/19)）
+- **手動:** フル M3 ゲート（Webview・DB・RBAC）は F5 + [`docs/m3_acceptance_ja.md`](docs/m3_acceptance_ja.md)
+
+## T-RDE v1.0
+
+- プロジェクトメタ: [`trde.config.json`](trde.config.json)
+- L1 trace map: [`docs/trace_maps/m3-minimal-ui-l1.yaml`](docs/trace_maps/m3-minimal-ui-l1.yaml)
+- ガイド: [`docs/t_rde_v_2_0_practical_guide.md`](docs/t_rde_v_2_0_practical_guide.md)
 
 ## 関連
 

@@ -4,7 +4,8 @@ Semantic lineage workspace for **MeaningDelta**, **RDE assessments**, and **huma
 
 **Spec:** [kotonoha-management `29_m3_minimal_ui_spec_draft.md`](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/29_m3_minimal_ui_spec_draft.md)  
 **Wireframes:** [`docs/ui-wireframes.md`](docs/ui-wireframes.md) · PNG in [`docs/images/`](docs/images/)  
-**Acceptance:** [`docs/m3_acceptance.md`](docs/m3_acceptance.md) (M3 gate §6)  
+**Acceptance:** [`docs/m3_acceptance.md`](docs/m3_acceptance.md) · [日本語](docs/m3_acceptance_ja.md) (M3 gate §6)  
+**T-RDE v1.0:** [`trde.config.json`](trde.config.json) · [`docs/trace_maps/m3-minimal-ui-l1.yaml`](docs/trace_maps/m3-minimal-ui-l1.yaml)
 **Operations manual:** [kotonoha-docs `ja/manual/vscode_extension_operations.md`](https://github.com/zyx-corporation/kotonoha-docs/blob/main/ja/manual/vscode_extension_operations.md)
 
 ## Prerequisites
@@ -28,7 +29,7 @@ M2 features (`rde attach --source-kind`, `export --format m2`) and current Phase
 | --- | --- |
 | `kotonoha.cliPath` | CLI binary (default: `kotonoha`) |
 | `kotonoha.projectPath` | Repo root (default: workspace folder) |
-| `kotonoha.databaseUrl` | PostgreSQL URL (**do not commit**) |
+| `kotonoha.databaseUrl` | PostgreSQL URL (**do not commit**). **UI preflight** requires this setting; when empty, panels block before calling the CLI. If empty, `cliEnv` does **not** override `DATABASE_URL` from the parent process — terminal-only CLI may still connect via shell env (B5; see acceptance doc). |
 | `kotonoha.decidedBy` | Default identity for review decisions |
 | `kotonoha.principalId` | M6/M7: principal UUID → `KOTONOHA_PRINCIPAL_ID` on CLI child processes |
 | `kotonoha.projectId` | M6/M7: project UUID → `KOTONOHA_PROJECT_ID` for scoped export / writes |
@@ -77,12 +78,13 @@ export DATABASE_URL='postgres://…'
 ./scripts/m3_acceptance_cli_preflight.sh
 ```
 
-See [`docs/m3_acceptance.md`](docs/m3_acceptance.md) for the full §6 checklist.
+See [`docs/m3_acceptance.md`](docs/m3_acceptance.md) ([日本語](docs/m3_acceptance_ja.md)) for the full §6 checklist.
 
 ## Development
 
 ```bash
-npm test            # Test First — see CONTRIBUTING.md
+npm test            # unit + contract (no VS Code host)
+npm run test:e2e    # extension host smoke — see CONTRIBUTING.md
 npm run compile
 ```
 

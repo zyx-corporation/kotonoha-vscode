@@ -4,7 +4,7 @@
 
 **Wireframes:** [`ui-wireframes.md`](ui-wireframes.md)
 
-**Parent:** [management#104](https://github.com/zyx-corporation/kotonoha-management/issues/104) · **Procedure:** [`m3_acceptance.md`](m3_acceptance.md)
+**Parent:** [management#104](https://github.com/zyx-corporation/kotonoha-management/issues/104) · **Procedure:** [`m3_acceptance.md`](m3_acceptance.md) · [日本語](m3_acceptance_ja.md)
 
 | Field | Value |
 | --- | --- |
@@ -46,7 +46,12 @@
 
 ## Follow-up issues (if Pass with notes)
 
-- RDE panel: sync `session.lastDeltaId` to webview on Register (local fix drafted).
-- RDE panel: clear `humanReviewRequired` banner after Approve when export contains `review_decisions` (local fix drafted).
-- `cliEnv`: document or tighten `DATABASE_URL` fallback when `kotonoha.databaseUrl` is empty (B5 / ops).
-- Optional: `kotonoha init` stub or hide until M6.
+| Item | Issue | Status |
+| --- | --- | --- |
+| RDE panel: sync ΔM after Register | [#14](https://github.com/zyx-corporation/kotonoha-vscode/issues/14) | addressed in PR branch `feat/t-rde-m3-issues-13-19` |
+| RDE panel: clear human review banner after Approve | [#15](https://github.com/zyx-corporation/kotonoha-vscode/issues/15) | addressed (export refresh on Approve) |
+| cli-errors EDH session steps | [#16](https://github.com/zyx-corporation/kotonoha-vscode/issues/16) | `m3_acceptance_ja.md` cli-errors section |
+| `cliEnv` B5 documentation | [#17](https://github.com/zyx-corporation/kotonoha-vscode/issues/17) | README + `cliEnv.ts` JSDoc |
+| Meaning Delta i18n webview | [#18](https://github.com/zyx-corporation/kotonoha-vscode/issues/18) | addressed |
+| E2E smoke CI | [#19](https://github.com/zyx-corporation/kotonoha-vscode/issues/19) | `npm run test:e2e` |
+| Optional: `kotonoha init` hide until M6 | — | backlog |

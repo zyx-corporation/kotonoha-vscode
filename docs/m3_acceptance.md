@@ -1,11 +1,16 @@
 # M3 acceptance procedure
 
+**日本語:** [m3_acceptance_ja.md](m3_acceptance_ja.md)
+
 **Normative gate:** [kotonoha-management `29_m3_minimal_ui_spec_draft.md` §6](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/29_m3_minimal_ui_spec_draft.md)
 
 **Parent track:** [management#104](https://github.com/zyx-corporation/kotonoha-management/issues/104)
 
 Automated unit tests: `npm test` (CLI contract parsers; no VS Code host required).  
+E2E smoke: `npm run test:e2e` (extension host + preflight contract).  
 **This document:** manual E2E in Extension Development Host (F5).
+
+**T-RDE v1.0:** [`trde.config.json`](../trde.config.json) · L1 trace map [`docs/trace_maps/m3-minimal-ui-l1.yaml`](trace_maps/m3-minimal-ui-l1.yaml)
 
 ---
 
@@ -72,7 +77,14 @@ export DATABASE_URL='postgres://…'
 ## Setup (once per machine)
 
 1. Clone / open a **Git** sample repository in VS Code.
-2. Build or install `kotonoha` (set `kotonoha.cliPath` if not on `PATH`).
+2. Build or install `kotonoha`. Release example:
+
+   ```bash
+   cd kotonoha-cli && cargo build --release
+   which kotonoha   # …/kotonoha-cli/target/release/kotonoha
+   ```
+
+   Workspace setting `kotonoha.cliPath`: full path above. Copy [`.vscode/settings.json.example`](../.vscode/settings.json.example) to `.vscode/settings.json`.
 3. **Bootstrap PostgreSQL** (see above): server up → database exists → `DATABASE_URL` set.
 4. Run `kotonoha db migrate`.
 5. Open **`kotonoha-vscode`** folder → **F5** (Run Extension). Shortcuts: `Cmd+Alt+K` (sidebar), `Cmd+Alt+Shift+M` (Meaning Delta) — see README.
@@ -92,13 +104,34 @@ Mark each item when verified in the **Extension Development Host**.
 | `register-delta` | 選択範囲または diff 単位で MeaningDelta を登録できる | **Meaning Delta** → fill *Intended change* (optional) → **Register ΔM**. UUID in panel + toast. | [ ] |
 | `show-rde` | 紐づく RDEAssessment を読み取り表示できる | **RDE & Review** → attach RDE (file or clipboard; `kotonoha rde emit` JSON). **Refresh export preview**. See assessment id, `validation_report` warnings if any. | [ ] |
 | `record-review` | ReviewDecision を UI から記録できる | **Approve** (or Hold/Reject). Success message. Banner: *RDE does not substitute for human judgment.* | [ ] |
-| `cli-errors` | Kotonoha Core（CLI 経由）と通信でき、エラーがユーザーに伝わる | Clear `kotonoha.databaseUrl` → Register ΔM → error text (env / exit 1). Restore URL. Invalid review without ΔM → error. | [ ] |
+| `cli-errors` | Kotonoha Core（CLI 経由）と通信でき、エラーがユーザーに伝わる | Follow **cli-errors** steps below (①②). | [ ] |
 | `readme` | README にインストール・設定・M1 デモとの関係が書かれている | Skim [README.md](../README.md): install, settings, acceptance link, CLI compatibility. | [ ] |
 | `i18n-ja` | UI 多言語化（日本語） | Set VS Code display language to **日本語**. Repeat `git-context` → `register-delta` → `show-rde` → `record-review` in Japanese UI. No missing-key placeholders. | [ ] |
 | `i18n-en` | UI 多言語化（英語） | Set display language to **English**. Repeat the same four operations in English UI. | [ ] |
 | `design-review` | UI デザイン評価 | Complete D1〜D5 per [management `32` §2.2](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/32_milestone_ui_quality_gates_draft.md). Record in `docs/ui-design-review-m3.md` or [#104](https://github.com/zyx-corporation/kotonoha-management/issues/104). Judgment: Pass or Pass with notes. | [ ] |
 
 Programmatic mirror (drift guard): `src/m3AcceptanceChecklist.ts` + `npm test`.
+
+### cli-errors steps
+
+**① Empty `kotonoha.databaseUrl` → Register ΔM**
+
+1. **Settings** → `kotonoha.databaseUrl` → **Workspace** tab: clear the value entirely.
+2. **Meaning Delta** → **Register ΔM**.
+3. **Expect:** red preflight text in the panel; **no** UUID success toast.
+4. Restore the URL.
+
+**B5 note:** If the parent process has `DATABASE_URL`, the UI still blocks when the setting is empty (preflight before CLI). Standalone CLI in a terminal may connect via env — see README Settings.
+
+**② Review without ΔM**
+
+1. **Stop debugging** (close Extension Development Host) → **F5** again (clears `session.lastDeltaId`).
+2. Open sample repo; set `kotonoha.databaseUrl`.
+3. Do **not** register a Meaning Delta.
+4. **RDE & Review** → **Approve**.
+5. **Expect:** `Register a MeaningDelta first.` — no `Review recorded` toast.
+
+If you already registered ΔM in the same EDH session, step ② will succeed (expected). Restart EDH before testing.
 
 ---
 
@@ -149,3 +182,4 @@ When all **nine** rows are checked:
 | --- | --- |
 | 2026-05-20 | Initial M3-d procedure |
 | 2026-05-20 | Gate rows `i18n-ja`, `i18n-en`, `design-review`（[`32`](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/32_milestone_ui_quality_gates_draft.md)） |
+| 2026-05-26 | Japanese edition [`m3_acceptance_ja.md`](m3_acceptance_ja.md); cross-links |

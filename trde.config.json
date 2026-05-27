@@ -1,0 +1,23 @@
+{
+  "comment": "T-RDE v1.0 ProjectMetadata — kotonoha-vscode (M3). See docs/t_rde_v_2_0_practical_guide.md §13.2.1",
+  "project_metadata": {
+    "public_facing": false,
+    "handles_personal_data": true,
+    "has_authentication": true,
+    "has_payment_or_billing": false,
+    "safety_critical": false,
+    "regulated_domain": false,
+    "accessibility_required": true,
+    "expected_users": "developers_and_reviewers"
+  },
+  "domain_profile": {
+    "name": "institutional_document",
+    "selection_status": "explicit"
+  },
+  "force_external_verification": [
+    "security_review",
+    "accessibility_audit"
+  ],
+  "trde_level": "L1",
+  "trace_map": "docs/trace_maps/m3-minimal-ui-l1.yaml"
+}
