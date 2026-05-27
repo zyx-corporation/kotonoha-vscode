@@ -5,7 +5,7 @@ Semantic lineage workspace for **MeaningDelta**, **RDE assessments**, and **huma
 **Spec:** [kotonoha-management `29_m3_minimal_ui_spec_draft.md`](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/29_m3_minimal_ui_spec_draft.md)  
 **Wireframes:** [`docs/ui-wireframes.md`](docs/ui-wireframes.md) · PNG in [`docs/images/`](docs/images/)  
 **Acceptance:** [`docs/m3_acceptance.md`](docs/m3_acceptance.md) · [日本語](docs/m3_acceptance_ja.md) (M3 gate §6)  
-**T-RDE v1.0:** [canonical guide (`kotonoha-spec`)](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_v_1.md) · [`trde.config.json`](trde.config.json) · [`docs/trace_maps/m3-minimal-ui-l1.yaml`](docs/trace_maps/m3-minimal-ui-l1.yaml)
+**T-RDE v1.0:** [canonical guide (`kotonoha-spec`)](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/T-RDE_v1.0.md) · [`trde.config.json`](trde.config.json) · [`docs/trace_maps/m3-minimal-ui-l1.yaml`](docs/trace_maps/m3-minimal-ui-l1.yaml)
 **Operations manual:** [kotonoha-docs `ja/manual/vscode_extension_operations.md`](https://github.com/zyx-corporation/kotonoha-docs/blob/main/ja/manual/vscode_extension_operations.md)
 
 ## Prerequisites

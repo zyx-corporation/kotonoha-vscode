@@ -1,12 +1,12 @@
 # T-RDE v1.0 L1 trace_map — kotonoha-vscode M3 Minimal UI
-# Normative guide (canonical): kotonoha-spec docs/t_rde_v_1.md §8 (L1), §7
+# Normative guide (canonical): kotonoha-spec docs/T-RDE_v1.0.md §8 (L1), §7
 # M3 gate: management 29_m3_minimal_ui_spec_draft.md §6
 # Parent: https://github.com/zyx-corporation/kotonoha-management/issues/104
 
 trace_map:
   version: "2026-05-27"
   trde_version: "1.0"
-  guide: https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_v_1.md
+  guide: https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/T-RDE_v1.0.md
   guide_repository: kotonoha-spec
   domain: institutional_document
   domain_selection_status: explicit

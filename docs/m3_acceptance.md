@@ -10,7 +10,27 @@ Automated unit tests: `npm test` (CLI contract parsers; no VS Code host required
 E2E smoke: `npm run test:e2e` (extension host + preflight contract).  
 **This document:** manual E2E in Extension Development Host (F5).
 
-**T-RDE v1.0:** [`trde.config.json`](../trde.config.json) · L1 trace map [`docs/trace_maps/m3-minimal-ui-l1.yaml`](trace_maps/m3-minimal-ui-l1.yaml) · canonical guide [kotonoha-spec `t_rde_v_1.md`](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_v_1.md)
+**T-RDE v1.0:** [`trde.config.json`](../trde.config.json) · L1 trace map [`docs/trace_maps/m3-minimal-ui-l1.yaml`](trace_maps/m3-minimal-ui-l1.yaml) · canonical guide [kotonoha-spec `T-RDE_v1.0.md`](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/T-RDE_v1.0.md)
+
+---
+
+## Test Plan (M3)
+
+M3 acceptance uses a **two-layer gate**: automated checks + manual UI acceptance.
+Run in this order:
+
+1. `npm test` (contracts/parsers/preflight)
+2. `npm run test:e2e` (extension-host smoke)
+3. Manual 9-row gate in this document (F5 flow)
+
+| Layer | Command / Procedure | Purpose | Pass criteria |
+| --- | --- | --- | --- |
+| Unit/Contract | `npm test` | Prevent regressions in CLI contracts, messages, and preflight rules | All tests pass |
+| E2E Smoke | `npm run test:e2e` | Ensure extension loads and baseline preflight path works | Exit code 0 |
+| Manual Gate | 9-row checklist below | Validate UI path, RBAC, i18n, and design review | All 9 rows checked |
+| T-RDE L2 (optional) | [execution prompt §9/§10](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_%E5%AE%9F%E8%A1%8C%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88_v_1_%E8%AB%96%E6%96%87%E6%BA%96%E6%8B%A0.md) + M3 diff | Meaning audit record | `semantic_map` or trace_map updated; human judgment points explicit |
+
+**T-RDE alignment:** update `trace_map` and `trde.config.json` against `kotonoha-spec/docs/T-RDE_v1.0.md` and the canonical execution prompt after manual gate completion.
 
 ---
 
@@ -183,3 +203,4 @@ When all **nine** rows are checked:
 | 2026-05-20 | Initial M3-d procedure |
 | 2026-05-20 | Gate rows `i18n-ja`, `i18n-en`, `design-review`（[`32`](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/32_milestone_ui_quality_gates_draft.md)） |
 | 2026-05-26 | Japanese edition [`m3_acceptance_ja.md`](m3_acceptance_ja.md); cross-links |
+| 2026-05-27 | Added explicit test plan layers (unit / smoke / manual gate) |

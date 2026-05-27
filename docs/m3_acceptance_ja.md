@@ -10,7 +10,26 @@
 E2E スモーク: `npm run test:e2e`（拡張ホスト起動・preflight 契約）。  
 **本書:** Extension Development Host（F5）での手動 E2E。
 
-**T-RDE v1.0（意味監査）:** [`trde.config.json`](../trde.config.json) · L1 trace_map [`docs/trace_maps/m3-minimal-ui-l1.yaml`](trace_maps/m3-minimal-ui-l1.yaml) · ガイド正本 [kotonoha-spec `t_rde_v_1.md`](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_v_1.md)（§8 L1 / §7）
+**T-RDE v1.0（意味監査）:** [`trde.config.json`](../trde.config.json) · L1 trace_map [`docs/trace_maps/m3-minimal-ui-l1.yaml`](trace_maps/m3-minimal-ui-l1.yaml) · 理論 [kotonoha-spec `T-RDE_v1.0.md`](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/T-RDE_v1.0.md) · 実行プロンプト [kotonoha-spec `t_rde_実行プロンプト_v_1_論文準拠.md`](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_%E5%AE%9F%E8%A1%8C%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88_v_1_%E8%AB%96%E6%96%87%E6%BA%96%E6%8B%A0.md)
+
+---
+
+## テスト計画（M3）
+
+M3 は **自動テスト + 手動ゲート** の二層で判定する。実行順は次のとおり。
+
+1. `npm test`（契約・パーサ・preflight）
+2. `npm run test:e2e`（拡張ホストのスモーク）
+3. 本書の 9 ゲート手動確認（F5）
+
+| レイヤー | コマンド / 手順 | 目的 | 合格条件 |
+| --- | --- | --- | --- |
+| Unit/Contract | `npm test` | CLI 契約、メッセージ、preflight の退行防止 | 全テスト green |
+| E2E Smoke | `npm run test:e2e` | 拡張起動・コマンド登録・最低限 preflight の保証 | ジョブ成功（exit 0） |
+| Manual Gate | 本書チェックリスト（9項目） | UI 経路・RBAC・i18n・設計レビューの最終受け入れ | 9 行すべて [✓] |
+| T-RDE L2（任意） | [実行プロンプト §9/§10](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_%E5%AE%9F%E8%A1%8C%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88_v_1_%E8%AB%96%E6%96%87%E6%BA%96%E6%8B%A0.md) + M3 差分 | 意味監査（intent / implicit / ΔU）の記録 | `semantic_map` または trace_map 更新・人間判断箇所の明示 |
+
+**T-RDE 対応:** `trace_map` / `trde.config.json` は正本（`T-RDE_v1.0.md` + 実行プロンプト）を参照し、手動ゲート結果で更新する。
 
 ---
 
@@ -205,6 +224,8 @@ M3 は CLI 受け入れを**置き換えない**。同一コマンド上の**人
 | 2026-05-20 | ゲート行 `i18n-ja`, `i18n-en`, `design-review`（`[32](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/32_milestone_ui_quality_gates_draft.md)`） |
 | 2026-05-26 | 日本語版 `m3_acceptance_ja.md` 追加。英文版と相互リンク                                                                                                                          |
 | 2026-05-20 | T-RDE L1 trace_map / cli-errors 手順 / B5 注記（[#13](https://github.com/zyx-corporation/kotonoha-vscode/issues/13)–[#19](https://github.com/zyx-corporation/kotonoha-vscode/issues/19)） |
-| 2026-05-27 | ガイド正本 [kotonoha-spec `t_rde_v_1.md`](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_v_1.md) に準拠 |
+| 2026-05-27 | ガイド正本 [kotonoha-spec `T-RDE_v1.0.md`](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/T-RDE_v1.0.md) に準拠 |
+| 2026-05-27 | テスト計画（Unit/Smoke/Manual の三層）を明文化 |
+| 2026-05-27 | 実行プロンプト正本 `t_rde_実行プロンプト_v_1_論文準拠.md` をテスト計画 L2 に接続 |
 
 
