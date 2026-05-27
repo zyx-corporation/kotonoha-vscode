@@ -1,7 +1,9 @@
 {
-  "comment": "T-RDE v1.0 ProjectMetadata — kotonoha-vscode (M3). Normative: docs/t_rde_v_1.md §13.2.1",
+  "comment": "T-RDE v1.0 ProjectMetadata — kotonoha-vscode (M3). Guide canonical in kotonoha-spec §13.2.1",
   "trde_version": "1.0",
-  "guide": "docs/t_rde_v_1.md",
+  "guide_canonical_repository": "https://github.com/zyx-corporation/kotonoha-spec",
+  "guide_path": "docs/t_rde_v_1.md",
+  "guide": "https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_v_1.md",
   "project_metadata": {
     "public_facing": false,
     "handles_personal_data": true,

@@ -10,7 +10,7 @@ Automated unit tests: `npm test` (CLI contract parsers; no VS Code host required
 E2E smoke: `npm run test:e2e` (extension host + preflight contract).  
 **This document:** manual E2E in Extension Development Host (F5).
 
-**T-RDE v1.0:** [`trde.config.json`](../trde.config.json) · L1 trace map [`docs/trace_maps/m3-minimal-ui-l1.yaml`](trace_maps/m3-minimal-ui-l1.yaml) · guide [`t_rde_v_1.md`](t_rde_v_1.md)
+**T-RDE v1.0:** [`trde.config.json`](../trde.config.json) · L1 trace map [`docs/trace_maps/m3-minimal-ui-l1.yaml`](trace_maps/m3-minimal-ui-l1.yaml) · canonical guide [kotonoha-spec `t_rde_v_1.md`](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_v_1.md)
 
 ---
 

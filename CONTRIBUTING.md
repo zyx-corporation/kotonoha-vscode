@@ -27,7 +27,7 @@ npm run lint      # tsc --noEmit
 
 - プロジェクトメタ: [`trde.config.json`](trde.config.json)
 - L1 trace map: [`docs/trace_maps/m3-minimal-ui-l1.yaml`](docs/trace_maps/m3-minimal-ui-l1.yaml)
-- ガイド（正式版）: [`docs/t_rde_v_1.md`](docs/t_rde_v_1.md)
+- ガイド（正本・編集は spec 側）: [kotonoha-spec `docs/t_rde_v_1.md`](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_v_1.md)
 
 ## 関連
 
