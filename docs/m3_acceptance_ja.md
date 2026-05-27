@@ -27,7 +27,7 @@ M3 は **自動テスト + 手動ゲート** の二層で判定する。実行�
 | Unit/Contract | `npm test` | CLI 契約、メッセージ、preflight の退行防止 | 全テスト green |
 | E2E Smoke | `npm run test:e2e` | 拡張起動・コマンド登録・最低限 preflight の保証 | ジョブ成功（exit 0） |
 | Manual Gate | 本書チェックリスト（9項目） | UI 経路・RBAC・i18n・設計レビューの最終受け入れ | 9 行すべて [✓] |
-| T-RDE L2（任意） | [実行プロンプト §9/§10](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_%E5%AE%9F%E8%A1%8C%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88_v_1_%E8%AB%96%E6%96%87%E6%BA%96%E6%8B%A0.md) + M3 差分 | 意味監査（intent / implicit / ΔU）の記録 | `semantic_map` または trace_map 更新・人間判断箇所の明示 |
+| T-RDE L2（任意） | [実行プロンプト v1.1a §9/§5/§10](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_%E5%AE%9F%E8%A1%8C%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88_v_1_%E8%AB%96%E6%96%87%E6%BA%96%E6%8B%A0.md) + M3 差分 | 意味監査（intent / implicit / ΔU / resonance）の記録 | `semantic_map` または trace_map 更新・人間判断箇所の明示 |
 
 **T-RDE 対応:** `trace_map` / `trde.config.json` は正本（`T-RDE_v1.0.md` + 実行プロンプト）を参照し、手動ゲート結果で更新する。
 
