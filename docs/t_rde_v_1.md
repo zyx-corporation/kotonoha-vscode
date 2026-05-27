@@ -1,6 +1,6 @@
 # T-RDE v1.0: バイブコーディングのための意味監査フレームワーク
 
-**Test-Resonance Design Evaluation v1.0 実践ガイド — v1.0 正式版**
+**Test-Resonance Design Evaluation v1.0 実践ガイド — 正式版**
 
 > バイブコーディングにおける意味変化を、ΔM価値生成論の横断観測レンズを通じて監査し、「動くこと」でも「意図が保存されていること」でもなく、「意味変化が価値生成の方向に、不確実性を適切に扱いながら生じていること」を評価するフレームワーク。本文書はLLMへの基本指示書としても機能する。
 
@@ -10,14 +10,14 @@
 
 T-RDE v1.0は、ΔM価値生成論（Kano, 2026, Zenodo DOI: 10.5281/zenodo.20282012）を横断観測レンズとして採用し、バイブコーディング領域に適用する実践的実装の一例である。
 
-ΔM理論自身は「価値とは何かを最終的に決定する主理論ではなく、複数の価値論を横断して、価値生成が意味変化として現れる局面を観測するための横断観測理論」（ΔM論文§3）である。したがって、本ガイドの限界がΔM理論の限界を意味するものではなく、T-RDE v1は形式的検証やHoare論理など他の検証手法と併用可能である。
+ΔM理論自身は「価値とは何かを最終的に決定する主理論ではなく、複数の価値論を横断して、価値生成が意味変化として現れる局面を観測するための横断観測理論」（ΔM論文§3）である。したがって、本ガイドの限界がΔM理論の限界を意味するものではなく、T-RDE v1.0は形式的検証やHoare論理など他の検証手法と併用可能である。
 
-**v1.0からの主要な変更**：
+**T-RDE v1.0における主要な設計変更**：
 
-| 項目 | v1.0 | v2.0 |
-|------|------|------|
-| 意味変化の評価 | severity（0-1単一スカラー） | ΔM五成分（ΔS,ΔP,ΔR,ΔI,ΔU） |
-| 品質ゲート | カバレッジ・保存率・最大severity | ΔU健全性（前提）→ σ拒否条件 → α-σ象限 |
+| 項目 | 旧設計 | T-RDE v1.0 |
+|------|--------|------------|
+| 意味変化の評価 | severity（0-1単一スカラー） | ΔM五成分（ΔS, ΔP, ΔR, ΔI, ΔU） |
+| 品質ゲート | カバレッジ・保存率・最大severity | 共鳴条件 → ΔU健全性 → σ拒否条件 → α-σ象限 |
 | σの扱い | なし | 拒否条件型を基底に置く非線形集約 |
 | ΔUの役割 | 他の成分と並列 | 乗算的制約（前提条件）＋時間的変化追跡 |
 | 循環性への対策 | 対照検証のみ | 差分監査＋両方向検証＋コンセンサス監査 |
@@ -27,7 +27,7 @@ T-RDE v1.0は、ΔM価値生成論（Kano, 2026, Zenodo DOI: 10.5281/zenodo.2028
 
 **v1.0で確定した主要設計**：
 
-| 指摘 | 対応 |
+| 論点 | 対応 |
 |------|------|
 | 低α・負σの条件付き合格 | 負σはαに関わらず `pass: false` とし、低αの場合のみ `requiresReview` による人間判断を許容 |
 | L1 trace mapのΔU欠如 | `uncertainty_flags` と `confidence` / `uncertainty_handled` を追加 |
@@ -36,30 +36,30 @@ T-RDE v1.0は、ΔM価値生成論（Kano, 2026, Zenodo DOI: 10.5281/zenodo.2028
 | 共鳴条件の暗黙化 | `resonanceConditions` を品質ゲート出力に追加し、意味整合・不確実性較正・価値調整・修復可能性を明示 |
 | σ重み・ΔU drift重みの根拠不明 | すべて暫定ヒューリスティックとして明記し、キャリブレーション対象・必要データを定義 |
 | valueCeilingの浮遊 | 最終価値生成判定・外部検証統合・レポート表示への接続を明記 |
-| severity互換表 | 本文から付録へ移動し、v1移行補助であることを明記 |
+| severity互換表 | 本文から付録へ移動し、旧設計からの移行補助であることを明記 |
 | T-RDE文書生成の再帰性 | 文書自体がバイブコーディング的に生成されていることを自己適用例として明示 |
 
 ---
 
-## 1. なぜT-RDE v1が必要か
+## 1. なぜT-RDE v1.0が必要か
 
-### 1.1 v1.0が解決した問題
+### 1.1 旧設計が解決した問題
 
-バイブコーディングの受け入れテストが「UIが動くかどうか」に縮退し、「設計意図が保存されているかどうか」が検証されない問題に対して、T-RDE v1.0はセマンティックマップ、六段階パイプライン、品質ゲートを導入した。
+バイブコーディングの受け入れテストが「UIが動くかどうか」に縮退し、「設計意図が保存されているかどうか」が検証されない問題に対して、旧設計はセマンティックマップ、六段階パイプライン、品質ゲートを導入した。
 
-### 1.2 v1.0が答えられなかった問い
+### 1.2 旧設計が答えられなかった問い
 
-v1.0の評価軸は「逸脱の有無」と「severityの大きさ」に偏っていた。以下の問いに答えるにはΔM理論の統合が必要である。
+旧設計の評価軸は「逸脱の有無」と「severityの大きさ」に偏っていた。以下の問いに答えるにはΔM理論の統合が必要である。
 
-第一に、意味変化の方向性の問い。severityが高い変化であっても、それが価値生成（ユーザーの行為可能性の拡張、関係性の深化）に向かっているなら、単純に「問題」とは言えない。v1.0には変化の方向を評価する軸がなかった。
+第一に、意味変化の方向性の問い。severityが高い変化であっても、それが価値生成（ユーザーの行為可能性の拡張、関係性の深化）に向かっているなら、単純に「問題」とは言えない。旧設計には変化の方向を評価する軸がなかった。
 
 第二に、不確実性の扱いの問い。LLMが暗黙に補完した前提が「不確実性を適切に扱っているか」は、機能的な正誤とは独立した評価軸である。過剰確信による意味変化は、たとえseverityが小さくても構造的なリスクを孕む。
 
-第三に、循環性の問い。LLMが自身の意味逸脱を正しく報告できるかという再帰的問題に対して、v1.0は別LLMによる対照検証のみを提供していたが、これだけでは不十分である。
+第三に、循環性の問い。LLMが自身の意味逸脱を正しく報告できるかという再帰的問題に対して、旧設計は別LLMによる対照検証のみを提供していたが、これだけでは不十分である。
 
 ### 1.3 5分で始めるT-RDE
 
-T-RDE v1を最初からL3監査として導入する必要はない。最小導入では、コード生成依頼の前に「何を保存すべきか」を自然言語で列挙し、生成後に「保存されたもの／変形されたもの／未実装のもの／AIが勝手に足したもの」を確認するだけでよい。
+T-RDE v1.0を最初からL3監査として導入する必要はない。最小導入では、コード生成依頼の前に「何を保存すべきか」を自然言語で列挙し、生成後に「保存されたもの／変形されたもの／未実装のもの／AIが勝手に足したもの」を確認するだけでよい。
 
 **最小ワークフロー**：
 
@@ -122,7 +122,7 @@ T-RDEにおけるResonance（共鳴）とは、単なる一致、同意、類似
 
 ### 2.1 意味変化の五成分（ΔMベクトル）
 
-v1.0のseverity（単一スカラー）に代わり、v1.0では意味変化をΔM論文§6の五成分で評価する。
+旧設計のseverity（単一スカラー）に代わり、T-RDE v1.0では意味変化をΔM論文§6の五成分で評価する。
 
 | 成分 | 定義 | バイブコーディングでの例 |
 |------|------|--------------------------|
@@ -132,7 +132,7 @@ v1.0のseverity（単一スカラー）に代わり、v1.0では意味変化を�
 | **ΔI** | 制度的配置の変化 | LocalStorage永続化（データ管理ルールの暗黙的導入） |
 | **ΔU** | 不確実性の扱いの変化 | 期限切れ警告の未実装（不確実性への対処の欠如） |
 
-**ΔUの特殊な地位**：ΔUは他の四成分と並列ではない。ΔM論文§6.1は「ΔUは、意味内容の変化、行為可能性の拡大、関係変化、制度変化が、過剰確信や偽の単純化によって暴走しないための健全性制約として機能する」と定義している。T-RDE v1ではこれを「品質ゲートの前提条件」として実装する（§7）。
+**ΔUの特殊な地位**：ΔUは他の四成分と並列ではない。ΔM論文§6.1は「ΔUは、意味内容の変化、行為可能性の拡大、関係変化、制度変化が、過剰確信や偽の単純化によって暴走しないための健全性制約として機能する」と定義している。T-RDE v1.0ではこれを「品質ゲートの前提条件」として実装する（§7）。
 
 ### 2.2 α（構造増幅係数）とσ（コンヴィヴィアル係数）
 
@@ -142,13 +142,13 @@ v1.0のseverity（単一スカラー）に代わり、v1.0では意味変化を�
 
 **σ（-1〜+1）** は意味変化の方向性と許容可能性を表す。σが正であるとは、意味変化が主体の自律性、相互理解、創造性、応答可能性を高める場合である。σが負であるとは、依存、偏見、分断、硬直化、責任回避を強める場合である。
 
-ΔM論文§11の核心的制約：**σを単純な平均的良さとして扱ってはならない**。保存された要素や有益な補完が多数存在しても、重大な歪曲、権利侵害、責任配置の消失、取り返しのつかない危険が一つ含まれるならば、それは単純平均によって相殺できない。T-RDE v1ではこれを「拒否条件型σ」として実装する（§5.2）。
+ΔM論文§11の核心的制約：**σを単純な平均的良さとして扱ってはならない**。保存された要素や有益な補完が多数存在しても、重大な歪曲、権利侵害、責任配置の消失、取り返しのつかない危険が一つ含まれるならば、それは単純平均によって相殺できない。T-RDE v1.0ではこれを「拒否条件型σ」として実装する（§5.2）。
 
-**α-σカップリング**（ΔM論文§12）：αとσは概念的には分離できるが、実際のシステムでは増幅力そのものが方向性を歪める場合がある。バイブコーディングでの典型例は、LLMが「ユーザーの期待に応える」方向にコードを最適化する（αを高める）設計が、暗黙の前提補完を増やし、意味逸脱を拡大する（σを負方向に傾ける）構造である。v1.0ではこのカップリングを安全側に非対称に実装する（§5.2）。
+**α-σカップリング**（ΔM論文§12）：αとσは概念的には分離できるが、実際のシステムでは増幅力そのものが方向性を歪める場合がある。バイブコーディングでの典型例は、LLMが「ユーザーの期待に応える」方向にコードを最適化する（αを高める）設計が、暗黙の前提補完を増やし、意味逸脱を拡大する（σを負方向に傾ける）構造である。T-RDE v1.0ではこのカップリングを安全側に非対称に実装する（§5.2）。
 
-### 2.3 六段階パイプライン（v1から継承）
+### 2.3 六段階パイプライン
 
-データと意味は以下の六段階を通過する。v1.0では、各段階でどのΔM成分が特に変化しやすいかを追跡する。
+データと意味は以下の六段階を通過する。T-RDE v1.0では、各段階でどのΔM成分が特に変化しやすいかを追跡する。
 
 | 段階 | 内容 | 変化しやすいΔM成分 |
 |------|------|-------------------|
@@ -159,7 +159,7 @@ v1.0のseverity（単一スカラー）に代わり、v1.0では意味変化を�
 | **Export** | 出力形式への変換 | ΔI（フォーマット起因の制度的情報欠落） |
 | **Live** | 本番環境での稼働 | ΔR, ΔI（運用中の関係・制度ドリフト） |
 
-### 2.4 領域プロファイル（v2新設）
+### 2.4 領域プロファイル
 
 ΔM論文の表5（領域別ΔM成分の重み）に基づき、プロジェクトの領域に応じて五成分の評価重みを調整する。
 
@@ -187,8 +187,7 @@ v1.0のseverity（単一スカラー）に代わり、v1.0では意味変化を�
 1. 設計意図の各要素がどのコード構造に対応するかを明示せよ
 2. 設計意図に含まれるが実装に反映されていない要素があれば報告せよ
 3. 設計意図に含まれないが実装に追加した要素（暗黙の前提補完）を列挙せよ
-4. 各意図要素と暗黙補完について、ΔMの五成分（ΔS,ΔP,ΔR,ΔI,ΔU）のうち
-   どの成分が主に変化したかを報告せよ
+4. 各意図要素と暗黙補完について、ΔMの五成分（ΔS, ΔP, ΔR, ΔI, ΔU）のうち、どの成分が主に変化したかを報告せよ
 5. 不確実性の扱いに変化がある場合は特に注意して報告せよ：
    - 競合する解釈が存在するか
    - 条件付き判断を単純断言に変換していないか
@@ -198,19 +197,19 @@ v1.0のseverity（単一スカラー）に代わり、v1.0では意味変化を�
 コード生成後、以下のセマンティックマップを必ず添付せよ:
 
 ```yaml
-semantic_map_v1.0:
+semantic_map_v1:
   intent_elements:
     - id: I1
       description: "設計意図の要素"
       mapped_to: "対応するコード構造"
       status: preserved | transformed | deviated | not_implemented
-      delta_m_components: [S, P, R, I, U]   # 変化した成分
+      delta_m_components: [S, P, R, I, U]
       sigma_contribution: positive | negative | neutral
       uncertainty:
         confidence: 0.8
         competing_interpretations: ["解釈A", "解釈B"]
         conditional_notes: "〜の場合に限り成立"
-      transform_reason: "（transformedの場合）変形の理由"
+      transform_reason: "transformedの場合の変形理由"
   implicit_additions:
     - description: "AIが補完した前提"
       justification: "補完の根拠"
@@ -233,13 +232,13 @@ semantic_map_v1.0:
 ### 4.1 中核型
 
 ```typescript
-// t-rde-v2/types.ts
+// t-rde-v1/types.ts
 
 type DeltaMComponent = 'S' | 'P' | 'R' | 'I' | 'U';
 type Stage = 'raw' | 'edited' | 'normalize' | 'interpret' | 'export' | 'live';
 
-/** 設計意図の単一要素（v2拡張） */
-interface IntentElementV2 {
+/** 設計意図の単一要素 */
+interface IntentElementV1 {
   id: string;
   description: string;
   mappedTo: string | null;
@@ -247,15 +246,15 @@ interface IntentElementV2 {
   deltaMComponents: DeltaMComponent[];
   sigmaContribution: 'positive' | 'negative' | 'neutral';
   uncertainty: {
-    confidence: number;                    // 0-1
+    confidence: number;
     competingInterpretations: string[];
     conditionalNotes: string;
   };
   transformReason?: string;
 }
 
-/** AIが暗黙に補完した前提（v2拡張） */
-interface ImplicitAdditionV2 {
+/** AIが暗黙に補完した前提 */
+interface ImplicitAdditionV1 {
   description: string;
   justification: string;
   risk: 'low' | 'medium' | 'high';
@@ -264,32 +263,26 @@ interface ImplicitAdditionV2 {
   affectedStage: Stage;
 }
 
-/** 段階間の意味変化レコード（v1から継承＋v2拡張） */
+/** 段階間の意味変化レコード */
 interface DeltaMRecord {
   fromStage: Stage;
   toStage: Stage;
   element: string;
   changeType: 'preservation' | 'transformation' | 'deviation';
-  components: DeltaMComponent[];     // v1.0: どの成分が変化したか
+  components: DeltaMComponent[];
   description: string;
   approved: boolean;
 }
 
-/** 領域プロファイル */
 type ProfileSelectionStatus = 'explicit' | 'provisional' | 'unspecified';
 
 interface DomainProfile {
   name: string;
-  componentWeights: Record<DeltaMComponent, number>;  // 合計1.0
+  componentWeights: Record<DeltaMComponent, number>;
   selectionStatus: ProfileSelectionStatus;
   warning?: string;
 }
 
-/**
- * プロジェクトメタデータ。
- * セマンティックマップがLLM自己報告に依存することへの補助線。
- * 外部検証の常時発火ルールは、このメタデータを優先する。
- */
 interface ProjectMetadata {
   publicFacing: boolean;
   handlesPersonalData: boolean;
@@ -301,11 +294,6 @@ interface ProjectMetadata {
   expectedUsers: 'self' | 'internal_team' | 'external_users' | 'public';
 }
 
-/**
- * 暫定ヒューリスティックのキャリブレーション方針。
- * 以下の重み・閾値は理論から直接導出されたものではなく、
- * プロジェクト履歴・人間レビュー・外部検証結果に基づいて調整される対象である。
- */
 interface CalibrationPolicy {
   sourceData: Array<
     | 'past_semantic_maps'
@@ -319,32 +307,29 @@ interface CalibrationPolicy {
   requireRationaleForWeights: boolean;
 }
 
-/** ΔU健全性報告 */
 interface UncertaintySoundnessReport {
-  score: number;                       // 0-1
+  score: number;
   violations: string[];
   overconfidenceDetected: boolean;
   alternativesListed: boolean;
   conditionalJudgmentPresent: boolean;
-  temporalDrift?: number;              // v1.0: 前回マップからのΔU変化量（0-1）
+  temporalDrift?: number;
 }
 
-/** σの推定結果 */
 interface SigmaResult {
-  tentative: number;                   // 線形暫定値
+  tentative: number;
   vetoActive: boolean;
   vetoReason?: string;
-  couplingPenalty: number;             // α-σカップリングによる補正量
-  final: number;                       // 最終値
+  couplingPenalty: number;
+  final: number;
 }
 
-/** セマンティックマップv2全体 */
-interface SemanticMapV2 {
-  intentElements: IntentElementV2[];
-  implicitAdditions: ImplicitAdditionV2[];
+interface SemanticMapV1 {
+  intentElements: IntentElementV1[];
+  implicitAdditions: ImplicitAdditionV1[];
   deltaMs: DeltaMRecord[];
   alpha: number;
-  alphaBreakdown: Record<string, number>;  // v1.0: α算出根拠の透明化
+  alphaBreakdown: Record<string, number>;
   sigma: SigmaResult;
   uncertaintySoundness: UncertaintySoundnessReport;
   domainProfile: DomainProfile;
@@ -362,7 +347,7 @@ interface SemanticMapV2 {
 ### 5.1 αの推定（算出根拠の透明化）
 
 ```typescript
-// t-rde-v2/alpha-estimator.ts
+// t-rde-v1/alpha-estimator.ts
 
 interface VibeCodeContext {
   revisionCount: number;
@@ -378,18 +363,18 @@ function estimateAlpha(ctx: VibeCodeContext): {
   breakdown: Record<string, number>;
 } {
   const breakdown: Record<string, number> = {};
-  
+
   breakdown['revisions'] = Math.min(ctx.revisionCount * 8, 30);
   breakdown['implicit_assumptions'] = Math.min(ctx.implicitAssumptionCount * 10, 25);
   breakdown['domain_concepts'] = ctx.hasDomainConcepts ? 15 : 0;
   breakdown['stateful_logic'] = ctx.hasStatefulLogic ? 10 : 0;
   breakdown['external_integration'] = ctx.hasExternalIntegration ? 10 : 0;
   breakdown['security_concern'] = ctx.hasSecurityConcern ? 20 : 0;
-  
+
   const alpha = Math.min(100,
     Object.values(breakdown).reduce((a, b) => a + b, 0)
   );
-  
+
   return { alpha, breakdown };
 }
 ```
@@ -414,83 +399,55 @@ function estimateAlpha(ctx: VibeCodeContext): {
 - 調整の判断根拠は `trde.config.json` または監査ログに記録し、Git等でバージョン管理する。
 - σの暫定値と人間の最終判断が20%以上乖離する状態が続く場合、重み調整ではなく拒否条件・レビュー条件の再設計を優先する。
 
-したがって、実装では重みを固定定数として埋め込むのではなく、プロジェクト設定または監査ポリシーから注入可能にすることが望ましい。
-
 ```typescript
-// t-rde-v2/sigma-estimator.ts
+// t-rde-v1/sigma-estimator.ts
 
 interface SigmaContext {
-  // 拒否条件（一つでも該当すれば σ = -1、相殺不可）
   containsRightsViolation: boolean;
   accountabilityObscured: boolean;
   irreversibleRiskPresent: boolean;
-  
-  // 正方向の因子
   promotesUserAutonomy: boolean;
   enhancesExplainability: boolean;
   preservesUncertainty: boolean;
   strengthensRelationships: boolean;
-  
-  // 負方向の因子
   hidesAssumptions: boolean;
   reducesAccountability: boolean;
   overconfidenceDetected: boolean;
   reinforcesBias: boolean;
-  
-  // α-σカップリング用
   alpha: number;
 }
 
 function estimateSigma(ctx: SigmaContext): SigmaResult {
-  // ── 第一段階：拒否条件（ΔM論文§11「単純平均によって相殺できない」） ──
   if (ctx.containsRightsViolation) {
-    return {
-      tentative: -1, vetoActive: true,
-      vetoReason: '権利侵害の可能性',
-      couplingPenalty: 0, final: -1
-    };
+    return { tentative: -1, vetoActive: true, vetoReason: '権利侵害の可能性', couplingPenalty: 0, final: -1 };
   }
   if (ctx.accountabilityObscured) {
-    return {
-      tentative: -1, vetoActive: true,
-      vetoReason: '制度的責任の所在が不明瞭',
-      couplingPenalty: 0, final: -1
-    };
+    return { tentative: -1, vetoActive: true, vetoReason: '制度的責任の所在が不明瞭', couplingPenalty: 0, final: -1 };
   }
   if (ctx.irreversibleRiskPresent) {
-    return {
-      tentative: -1, vetoActive: true,
-      vetoReason: '取り返しのつかない危険',
-      couplingPenalty: 0, final: -1
-    };
+    return { tentative: -1, vetoActive: true, vetoReason: '取り返しのつかない危険', couplingPenalty: 0, final: -1 };
   }
-  
-  // ── 第二段階：線形暫定値（低リスク領域での探索的評価） ──
+
   let tentative = 0;
-  if (ctx.promotesUserAutonomy)    tentative += 0.30;
-  if (ctx.enhancesExplainability)  tentative += 0.20;
-  if (ctx.preservesUncertainty)    tentative += 0.20;
+  if (ctx.promotesUserAutonomy) tentative += 0.30;
+  if (ctx.enhancesExplainability) tentative += 0.20;
+  if (ctx.preservesUncertainty) tentative += 0.20;
   if (ctx.strengthensRelationships) tentative += 0.15;
-  if (ctx.hidesAssumptions)        tentative -= 0.30;
-  if (ctx.reducesAccountability)   tentative -= 0.40;
-  if (ctx.overconfidenceDetected)  tentative -= 0.25;
-  
-  // ── 第三段階：指数減衰（深刻な偏見は正の因子を大きく毀損する） ──
+  if (ctx.hidesAssumptions) tentative -= 0.30;
+  if (ctx.reducesAccountability) tentative -= 0.40;
+  if (ctx.overconfidenceDetected) tentative -= 0.25;
+
   if (ctx.reinforcesBias) {
     tentative = -Math.abs(tentative) * 0.8;
   }
-  
-  // ── 第四段階：α-σカップリング（高α時に負σが拡大される効果） ──
-  // 非対称設計：負方向のみ増幅。正方向は増幅しない（安全側に倒す）。
-  // ΔM論文§12「増幅力そのものが方向性を歪める場合がある」の操作的実装。
+
   let couplingPenalty = 0;
   if (ctx.alpha > 60 && tentative < 0) {
     couplingPenalty = (Math.exp((ctx.alpha - 60) / 30) - 1) * Math.abs(tentative);
-    couplingPenalty = Math.min(couplingPenalty, 0.4);  // 上限
+    couplingPenalty = Math.min(couplingPenalty, 0.4);
   }
-  
+
   const final = Math.max(-1, Math.min(1, tentative - couplingPenalty));
-  
   return { tentative, vetoActive: false, couplingPenalty, final };
 }
 ```
@@ -502,53 +459,44 @@ function estimateSigma(ctx: SigmaContext): SigmaResult {
 この要件に対応するため、ΔU監査は「変化の質」（三条件チェック）と「変化の大きさ」（前回マップとの差分によるtemporal drift検出）の二軸で行う。
 
 ```typescript
-// t-rde-v2/uncertainty-audit.ts
+// t-rde-v1/uncertainty-audit.ts
 
 function auditUncertaintySoundness(
-  intentElements: IntentElementV2[],
-  implicitAdditions: ImplicitAdditionV2[],
-  previousMap?: SemanticMapV2          // 差分監査用
+  intentElements: IntentElementV1[],
+  implicitAdditions: ImplicitAdditionV1[],
+  previousMap?: SemanticMapV1
 ): UncertaintySoundnessReport {
-  
   let overconfidenceDetected = false;
   let alternativesListed = true;
   let conditionalJudgmentPresent = true;
   const violations: string[] = [];
-  
-  // ── 変化の質：三条件チェック ──
-  
+
   for (const elem of intentElements) {
-    // 過剰確信：preserved + confidence > 0.95 + 競合解釈なし
     if (elem.status === 'preserved' &&
         elem.uncertainty.confidence > 0.95 &&
         elem.uncertainty.competingInterpretations.length === 0) {
       overconfidenceDetected = true;
       violations.push(`overconfidence: ${elem.id}`);
     }
-    
-    // 競合解釈の欠落：transformed なのに代替案なし
+
     if (elem.status === 'transformed' &&
         elem.uncertainty.competingInterpretations.length === 0) {
       alternativesListed = false;
       violations.push(`missing_alternatives: ${elem.id}`);
     }
-    
-    // 条件付き判断の欠落：deviated なのに条件注記なし
-    if (elem.status === 'deviated' &&
-        !elem.uncertainty.conditionalNotes) {
+
+    if (elem.status === 'deviated' && !elem.uncertainty.conditionalNotes) {
       conditionalJudgmentPresent = false;
       violations.push(`missing_conditionality: ${elem.id}`);
     }
   }
-  
-  // 高リスク暗黙補完の不確実性チェック
+
   for (const impl of implicitAdditions) {
     if (impl.risk === 'high' && !impl.uncertaintyHandled) {
       violations.push(`implicit_uncertainty_unhandled: ${impl.description.substring(0, 50)}`);
     }
   }
-  
-  // ── 変化の大きさ：temporal drift（差分監査時のみ） ──
+
   let temporalDrift: number | undefined;
   if (previousMap) {
     temporalDrift = computeUncertaintyDrift(intentElements, previousMap.intentElements);
@@ -556,18 +504,16 @@ function auditUncertaintySoundness(
       violations.push(`uncertainty_temporal_drift: ${temporalDrift.toFixed(2)}`);
     }
   }
-  
-  // スコア算出：三条件の加重和（0.3 + 0.3 + 0.4）
-  // temporal driftが大きい場合はスコアを減衰
+
   let score =
     (overconfidenceDetected ? 0 : 0.3) +
     (alternativesListed ? 0.3 : 0) +
     (conditionalJudgmentPresent ? 0.4 : 0);
-  
+
   if (temporalDrift !== undefined && temporalDrift > 0.3) {
     score *= (1 - Math.min(0.4, temporalDrift - 0.3));
   }
-  
+
   return {
     score,
     violations,
@@ -578,44 +524,37 @@ function auditUncertaintySoundness(
   };
 }
 
-/** 前回マップとの不確実性の扱いの変化を定量化 */
 function computeUncertaintyDrift(
-  current: IntentElementV2[],
-  previous: IntentElementV2[]
+  current: IntentElementV1[],
+  previous: IntentElementV1[]
 ): number {
   const prevMap = new Map(previous.map(e => [e.id, e]));
   let totalDrift = 0;
   let count = 0;
-  
+
   for (const elem of current) {
     const prev = prevMap.get(elem.id);
     if (!prev) continue;
     count++;
-    
-    // confidence の急変
+
     const confDiff = Math.abs(elem.uncertainty.confidence - prev.uncertainty.confidence);
-    
-    // 競合解釈の急減（生カウントとして記録）
     const prevAlts = prev.uncertainty.competingInterpretations.length;
     const currAlts = elem.uncertainty.competingInterpretations.length;
     const altDropped = prevAlts > 0 && currAlts === 0 ? 1 : 0;
-    
-    // 条件注記の消失（生カウントとして記録）
     const condDropped = prev.uncertainty.conditionalNotes && !elem.uncertainty.conditionalNotes ? 1 : 0;
-    
-    // 重みは暫定ヒューリスティック。CalibrationPolicyにより調整可能にする。
+
     const weights = {
       confidenceDiff: 1.0,
       alternativeDrop: 0.5,
       conditionalityDrop: 0.3,
     };
-    
+
     totalDrift +=
       confDiff * weights.confidenceDiff +
       altDropped * weights.alternativeDrop +
       condDropped * weights.conditionalityDrop;
   }
-  
+
   return count > 0 ? Math.min(1, totalDrift / count) : 0;
 }
 ```
@@ -623,7 +562,7 @@ function computeUncertaintyDrift(
 ### 5.4 領域プロファイルによる重み付き評価
 
 ```typescript
-// t-rde-v2/domain-profile.ts
+// t-rde-v1/domain-profile.ts
 
 const PROFILES: Record<string, DomainProfile> = {
   provisional_general: {
@@ -654,32 +593,26 @@ const PROFILES: Record<string, DomainProfile> = {
   },
 };
 
-/**
- * 領域プロファイルを考慮した重み付きΔM影響度を算出する。
- * 各IntentElementのdeltaMComponentsから、領域にとっての重要度を推定。
- */
 function computeWeightedImpact(
-  elements: IntentElementV2[],
+  elements: IntentElementV1[],
   profile: DomainProfile
 ): number {
   let totalImpact = 0;
-  
+
   for (const elem of elements) {
     if (elem.status === 'preserved') continue;
-    
-    // statusに応じた基底影響度
+
     const baseMagnitude =
       elem.status === 'transformed' ? 0.3 :
       elem.status === 'deviated' ? 0.7 :
       elem.status === 'not_implemented' ? 0.9 : 0;
-    
-    // 変化した成分の領域重みの合計で影響度を増幅
+
     const componentWeight = elem.deltaMComponents
       .reduce((sum, c) => sum + profile.componentWeights[c], 0);
-    
+
     totalImpact += baseMagnitude * componentWeight;
   }
-  
+
   return Math.min(1, totalImpact);
 }
 
@@ -690,12 +623,14 @@ function validateProfile(profile: DomainProfile, project: ProjectMetadata): void
       project.handlesPersonalData ||
       project.safetyCritical ||
       project.regulatedDomain;
+
     if (highRisk) {
       throw new Error(
         '高リスクプロジェクトでは provisional_general は使用できません。' +
         '明示的な領域プロファイルを選択するか、L3監査を実行してください。'
       );
     }
+
     console.warn(
       `⚠️ ${profile.name} は暫定プロファイルです。可能な限り明示的な領域を選択してください。`
     );
@@ -707,60 +642,53 @@ function validateProfile(profile: DomainProfile, project: ProjectMetadata): void
 
 ## 6. 循環性への対策
 
-LLMが自身の意味逸脱を正しく報告できるかという再帰的問題に対して、T-RDE v1は三つの独立した緩和策を提供する。
+LLMが自身の意味逸脱を正しく報告できるかという再帰的問題に対して、T-RDE v1.0は三つの独立した緩和策を提供する。
 
 ### 6.1 差分監査モード
 
 初回のフルマップ生成後、2回目以降は前回マップとの差分のみを追跡する。人間のレビュー負荷を70-90%削減する。
 
 ```typescript
-// t-rde-v2/diff-audit.ts
+// t-rde-v1/diff-audit.ts
 
 interface SemanticMapDiff {
-  addedIntents: IntentElementV2[];
+  addedIntents: IntentElementV1[];
   removedIntentIds: string[];
   modifiedIntents: { id: string; changes: string[] }[];
-  newImplicitAdditions: ImplicitAdditionV2[];
+  newImplicitAdditions: ImplicitAdditionV1[];
   resolvedImplicits: string[];
-  uncertaintyDrift: number;             // §5.3のtemporal drift
+  uncertaintyDrift: number;
 }
 
-function computeDiff(
-  prev: SemanticMapV2,
-  current: SemanticMapV2
-): SemanticMapDiff {
+function computeDiff(prev: SemanticMapV1, current: SemanticMapV1): SemanticMapDiff {
   const prevIds = new Set(prev.intentElements.map(e => e.id));
   const currIds = new Set(current.intentElements.map(e => e.id));
-  
+
   const added = current.intentElements.filter(e => !prevIds.has(e.id));
   const removed = [...prevIds].filter(id => !currIds.has(id));
-  
+
   const modified: { id: string; changes: string[] }[] = [];
   for (const elem of current.intentElements) {
     const prevElem = prev.intentElements.find(e => e.id === elem.id);
     if (!prevElem) continue;
-    
+
     const changes: string[] = [];
     if (prevElem.status !== elem.status) {
       changes.push(`status: ${prevElem.status} → ${elem.status}`);
     }
     if (prevElem.mappedTo !== elem.mappedTo) {
-      changes.push(`mappedTo changed`);
+      changes.push('mappedTo changed');
     }
     if (prevElem.sigmaContribution !== elem.sigmaContribution) {
       changes.push(`sigma: ${prevElem.sigmaContribution} → ${elem.sigmaContribution}`);
     }
     if (changes.length > 0) modified.push({ id: elem.id, changes });
   }
-  
-  // 暗黙補完の差分
+
   const prevImplDescs = new Set(prev.implicitAdditions.map(i => i.description));
   const newImplicits = current.implicitAdditions.filter(i => !prevImplDescs.has(i.description));
-  
-  const uncertaintyDrift = computeUncertaintyDrift(
-    current.intentElements, prev.intentElements
-  );
-  
+  const uncertaintyDrift = computeUncertaintyDrift(current.intentElements, prev.intentElements);
+
   return {
     addedIntents: added,
     removedIntentIds: removed,
@@ -771,9 +699,7 @@ function computeDiff(
   };
 }
 
-/** 差分監査の自動通過ルール */
 function canAutoApprove(diff: SemanticMapDiff): boolean {
-  // 以下の全てを満たす場合のみ自動通過
   return (
     diff.addedIntents.length === 0 &&
     diff.removedIntentIds.length === 0 &&
@@ -790,20 +716,18 @@ function canAutoApprove(diff: SemanticMapDiff): boolean {
 
 従来の一方向（意図→コード→「保存されているか？」）に加え、コードから意図を逆抽出し、元の意図と比較する。生成プロセスと分析プロセスを分離することで、循環性を部分的に破壊する。
 
-v1.0では、両方向検証はL3監査の補助ツールとして扱う。逆抽出された意図と元意図の類似度が低い場合でも、それだけで品質ゲートをblockingしない。抽象度・語彙・設計粒度の差による偽陽性が多いためである。
+T-RDE v1.0では、両方向検証はL3監査の補助ツールとして扱う。逆抽出された意図と元意図の類似度が低い場合でも、それだけで品質ゲートをblockingしない。抽象度・語彙・設計粒度の差による偽陽性が多いためである。
 
 ```typescript
-// t-rde-v2/bidirectional-verify.ts
+// t-rde-v1/bidirectional-verify.ts
 
 async function bidirectionalVerify(
   originalIntent: string,
   generatedCode: string,
   apiClient: LLMClient
 ): Promise<BidirectionalResult> {
-  // 方向1：コードが意図を満たすか（通常の監査）
   const forwardMap = await generateSemanticMap(originalIntent, generatedCode, apiClient);
-  
-  // 方向2：コードから「このコードは何をするか」を説明させる（別インスタンス）
+
   const reverseIntent = await apiClient.complete({
     system: 'このコードの設計意図を自然言語で記述してください。' +
             '機能の列挙ではなく、このコードが解決しようとしている問題と' +
@@ -811,13 +735,9 @@ async function bidirectionalVerify(
     messages: [{ role: 'user', content: generatedCode }],
     temperature: 0.1
   });
-  
-  // 方向3：元の意図と逆抽出した意図を比較（さらに別のLLMに比較させる）
+
   const comparison = await compareIntents(originalIntent, reverseIntent, apiClient);
-  
-  // 注意：semanticSimilarityは品質ゲートのblocking条件にも、レビュー推奨条件にも使わない。
-  // 語彙・抽象度・設計粒度の差によりノイズが多いため、参考値として表示するだけにする。
-  // 人間レビューを推奨するのは、明示的矛盾が検出された場合に限定する。
+
   if (comparison.explicitContradictions?.length > 0) {
     return {
       verdict: 'REVIEW_RECOMMENDED',
@@ -829,7 +749,7 @@ async function bidirectionalVerify(
       recommendedAction: '逆抽出結果に元意図と明示的に矛盾する説明があるため、人間レビューを推奨'
     };
   }
-  
+
   return {
     verdict: 'INFORMATIONAL',
     blocking: false,
@@ -848,7 +768,7 @@ async function bidirectionalVerify(
 ΔM理論の観点から、コンセンサス監査はΔUの可視化として再解釈できる。LLM間で判断が分かれること自体が、その判断が本質的に不確実であるという証拠になる。
 
 ```typescript
-// t-rde-v2/consensus-audit.ts
+// t-rde-v1/consensus-audit.ts
 
 interface AuditorConfig {
   model: string;
@@ -858,7 +778,6 @@ interface AuditorConfig {
 const DEFAULT_AUDITORS: AuditorConfig[] = [
   { model: 'claude-sonnet-4-20250514', temperature: 0.0 },
   { model: 'claude-sonnet-4-20250514', temperature: 0.3 },
-  // 利用可能であれば異なるプロバイダのモデルも追加
 ];
 
 async function consensusAudit(
@@ -869,29 +788,29 @@ async function consensusAudit(
   const results = await Promise.all(
     auditors.map(cfg => runSingleAudit(cfg, intent, code))
   );
-  
+
   const consensus: ConsensusResult = {
     elements: [],
     overallAgreement: 0,
     uncertaintyFromDisagreement: 0,
   };
-  
+
   const allIds = new Set(results.flatMap(r => r.intentElements.map(e => e.id)));
-  
+
   for (const id of allIds) {
     const votes = results
       .map(r => r.intentElements.find(e => e.id === id)?.status)
       .filter(Boolean) as string[];
-    
+
     const modeFn = (arr: string[]) => {
       const freq = new Map<string, number>();
       for (const v of arr) freq.set(v, (freq.get(v) || 0) + 1);
       return [...freq.entries()].sort((a, b) => b[1] - a[1])[0];
     };
-    
+
     const [majority, count] = modeFn(votes);
     const agreement = count / votes.length;
-    
+
     consensus.elements.push({
       id,
       status: agreement >= 0.6 ? majority : 'requires_human_review',
@@ -899,17 +818,15 @@ async function consensusAudit(
       votes,
     });
   }
-  
+
   const agreements = consensus.elements.map(e => e.agreement);
   consensus.overallAgreement = agreements.reduce((a, b) => a + b, 0) / agreements.length;
-  
-  // 合意率が低いほど不確実性が高い（ΔUの可視化）
-  // ただし、全員が過剰確信で合意している場合は負のΔU
+
   consensus.uncertaintyFromDisagreement =
     consensus.overallAgreement > 0.9
-      ? -0.2  // 過剰確信の可能性
+      ? -0.2
       : 1 - consensus.overallAgreement;
-  
+
   return consensus;
 }
 ```
@@ -918,9 +835,9 @@ async function consensusAudit(
 
 ## 7. 品質ゲート
 
-### 7.1 三軸構造
+### 7.1 四軸構造
 
-品質ゲートは以下の順序で評価する。v1.0では、T-RDEが「Resonance」を名乗る以上、意味整合・不確実性較正・価値調整・修復可能性の同時充足を最初に確認する。
+品質ゲートは以下の順序で評価する。T-RDE v1.0では、T-RDEが「Resonance」を名乗る以上、意味整合・不確実性較正・価値調整・修復可能性の同時充足を最初に確認する。
 
 | 優先順位 | 評価軸 | 役割 | 不合格時の扱い |
 |----------|--------|------|----------------|
@@ -932,12 +849,12 @@ async function consensusAudit(
 ### 7.2 品質ゲート実装
 
 ```typescript
-// t-rde-v2/quality-gate.ts
+// t-rde-v1/quality-gate.ts
 
 interface QualityGateConfig {
-  minUncertaintySoundness: number;     // ΔU閾値（デフォルト: 0.7）
-  maxAlphaForNegativeSigma: number;    // 低α・負σを要監察として扱う目安（合格条件ではない）
-  requireHumanOverrideOnVeto: boolean; // 拒否条件発動時に人間承認を要求
+  minUncertaintySoundness: number;
+  maxAlphaForNegativeSigma: number;
+  requireHumanOverrideOnVeto: boolean;
 }
 
 const DEFAULT_GATE: QualityGateConfig = {
@@ -961,16 +878,11 @@ interface GateResult {
   overrideRequired?: boolean;
   requiresReview?: boolean;
   resonanceConditions?: ResonanceConditions;
-  /**
-   * ΔU制約による評価上限値。
-   * ΔM論文§10の V*_max^restricted に対応。
-   * ΔUスコアが高ければ1.0（制限なし）、低ければ上限を制約。
-   */
   valueCeiling: number;
 }
 
 function checkResonanceConditions(
-  map: SemanticMapV2,
+  map: SemanticMapV1,
   gate: QualityGateConfig = DEFAULT_GATE
 ): ResonanceConditions {
   const reasons: string[] = [];
@@ -1013,15 +925,11 @@ function checkResonanceConditions(
 }
 
 function evaluateGate(
-  map: SemanticMapV2,
+  map: SemanticMapV1,
   gate: QualityGateConfig = DEFAULT_GATE
 ): GateResult {
-  const reasons: string[] = [];
   const resonanceConditions = checkResonanceConditions(map, gate);
-  
-  // ── 第一優先：共鳴条件の同時充足 ──
-  // T-RDEのRは、意味整合・不確実性較正・価値調整・修復可能性の同時充足を要求する。
-  // ただし各条件の理由を明示し、人間レビューによる例外判断を可能にする。
+
   if (!resonanceConditions.resonance) {
     return {
       pass: false,
@@ -1031,12 +939,10 @@ function evaluateGate(
       reasons: [`共鳴条件未充足: ${resonanceConditions.reasons.join('; ')}`],
     };
   }
-  
-  // ── 第二優先：ΔU健全性（前提条件） ──
-  // ΔM論文§10: G(ΔU) ∈ [0,1] は乗算的制約
+
   const uScore = map.uncertaintySoundness.score;
-  const valueCeiling = uScore;  // G(ΔU) をそのまま上限係数として使用
-  
+  const valueCeiling = uScore;
+
   if (uScore < gate.minUncertaintySoundness) {
     return {
       pass: false,
@@ -1048,8 +954,7 @@ function evaluateGate(
       ],
     };
   }
-  
-  // ── 第三優先：σ拒否条件 ──
+
   if (map.sigma.vetoActive) {
     return {
       pass: false,
@@ -1058,26 +963,16 @@ function evaluateGate(
       reasons: [`σ拒否条件発動: ${map.sigma.vetoReason}`],
     };
   }
-  
-  // ── 第四優先：α-σ四象限 ──
+
   const { quadrant } = map.summary;
-  
+
   switch (quadrant) {
     case 'HH':
-      return {
-        pass: true, valueCeiling,
-        reasons: ['高α・正σ: 価値生成候補（ΔU監査通過済み）'],
-      };
+      return { pass: true, valueCeiling, reasons: ['高α・正σ: 価値生成候補（ΔU監査通過済み）'] };
     case 'HL':
-      return {
-        pass: false, valueCeiling,
-        reasons: ['高α・負σ: 危険な逸脱の可能性'],
-      };
+      return { pass: false, valueCeiling, reasons: ['高α・負σ: 危険な逸脱の可能性'] };
     case 'LH':
-      return {
-        pass: true, valueCeiling,
-        reasons: ['低α・正σ: 穏やかな改善'],
-      };
+      return { pass: true, valueCeiling, reasons: ['低α・正σ: 穏やかな改善'] };
     case 'LL': {
       const isLowAlpha = map.alpha <= gate.maxAlphaForNegativeSigma;
       return {
@@ -1103,7 +998,7 @@ function evaluateGate(
 
 `valueCeiling`は、ΔU健全性によって価値生成判定の上限を制約する係数である。これはΔM論文§10の `V*_max^restricted` をT-RDE向けに操作化したものであり、単なる表示用フィールドではない。
 
-v1.0では、`valueCeiling`を以下の三箇所に接続する。
+T-RDE v1.0では、`valueCeiling`を以下の三箇所に接続する。
 
 第一に、最終レポートでは、α・σ・象限判定と並べて必ず表示する。これにより、「正σだが不確実性の扱いが弱い」ケースを可視化する。
 
@@ -1181,19 +1076,20 @@ trace_map:
 
 ---
 
-## 9. 具体例：優先度付きTodoアプリ（v2版）
+## 9. 具体例：優先度付きTodoアプリ
 
-v1.0の例を、v2の五成分・σ・ΔU監査で再評価する。
+旧設計の例を、T-RDE v1.0の五成分・σ・ΔU監査で再評価する。
 
 **設計意図**：
+
 - I1: タスクに「高・中・低」の三段階優先度がある
 - I2: 高優先度タスクが視覚的に目立つ
 - I3: 完了タスクは下に移動し、取り消し線で表示する
 - I4: 期限切れタスクは警告色で表示する
 
 ```yaml
-# todo-app.semantic-v2.yaml
-semantic_map_v1.0:
+# todo-app.semantic-v1.yaml
+semantic_map_v1:
   intent_elements:
     - id: I1
       description: "タスクに高・中・低の三段階優先度がある"
@@ -1271,10 +1167,8 @@ semantic_map_v1.0:
 
   alpha: 41
   alpha_breakdown:
-    revisions: 16        # 修正2回 * 8
-    implicit_assumptions: 25  # 暗黙補完3件 * 10 = 30、上限25適用
-    # 実際: 16 + 25 = 41
-    # 算出根拠と合計値を必ず一致させる
+    revisions: 16
+    implicit_assumptions: 25
     domain_concepts: 0
     stateful_logic: 0
     external_integration: 0
@@ -1282,14 +1176,6 @@ semantic_map_v1.0:
 
   sigma:
     tentative: 0.05
-    # promotesUserAutonomy=false, enhancesExplainability=false,
-    # preservesUncertainty=false, strengthensRelationships=false → +0
-    # hidesAssumptions=false, reducesAccountability=false,
-    # overconfidenceDetected=false, reinforcesBias=false → -0
-    # I4未実装は sigma_contribution: negative だが、
-    # σ推定の入力はSigmaContextであり、個別要素のcontributionとは別。
-    # 暗黙補完3件のうちhigh-risk 1件あるが拒否条件には該当しない。
-    # → tentative ≈ 0.05（ほぼ中立）
     veto_active: false
     coupling_penalty: 0
     final: 0.05
@@ -1307,16 +1193,18 @@ semantic_map_v1.0:
     component_weights: {S: 0.2, P: 0.2, R: 0.2, I: 0.2, U: 0.2}
 
   summary:
-    quadrant: "LH"    # α=41 < 50（低α）、σ=0.05 > 0（正σ）
+    quadrant: "LH"
     value_generation_judgment: neutral
 ```
 
 **品質ゲート結果**：
+
 - ΔU健全性スコア 0.7 ≥ 閾値 0.7 → 通過（ぎりぎり）
 - σ拒否条件 → 未発動
 - 象限 LH（低α・正σ）→ **合格**（穏やかな改善）
 
 **ただし以下のフォローアップが推奨**：
+
 1. LocalStorage永続化のリスク（データ形式、プライバシー）を明示的に仕様化し、uncertaintyHandled=trueにする
 2. I4（期限切れ警告）について設計者と合意を取る：実装するか、設計意図から削除するか
 3. 上記対応後にΔUスコアは0.7→0.85以上に改善する見込み
@@ -1326,17 +1214,16 @@ semantic_map_v1.0:
 ## 10. テストランナー
 
 ```typescript
-// t-rde-v2/tests/runner.test.ts
+// t-rde-v1/tests/runner.test.ts
 
 import { describe, it, expect } from 'vitest';
-import { loadSemanticMapV2 } from '../loader';
+import { loadSemanticMapV1 } from '../loader';
 import { auditUncertaintySoundness } from '../uncertainty-audit';
-import { estimateSigma } from '../sigma-estimator';
 import { evaluateGate } from '../quality-gate';
 import { computeWeightedImpact } from '../domain-profile';
 
 describe('T-RDE v1: Todo App', () => {
-  const map = loadSemanticMapV2('./todo-app.semantic-v2.yaml');
+  const map = loadSemanticMapV1('./todo-app.semantic-v1.yaml');
 
   it('ΔU健全性が閾値を満たすこと', () => {
     const report = auditUncertaintySoundness(
@@ -1358,22 +1245,26 @@ describe('T-RDE v1: Todo App', () => {
   it('領域プロファイルを変更した場合の影響度を確認', () => {
     const generalImpact = computeWeightedImpact(
       map.intentElements,
-      { name: 'provisional_general', componentWeights: { S: 0.2, P: 0.2, R: 0.2, I: 0.2, U: 0.2 }, selectionStatus: 'provisional' }
+      {
+        name: 'provisional_general',
+        componentWeights: { S: 0.2, P: 0.2, R: 0.2, I: 0.2, U: 0.2 },
+        selectionStatus: 'provisional'
+      }
     );
     const institutionalImpact = computeWeightedImpact(
       map.intentElements,
-      { name: 'institutional', componentWeights: { S: 0.15, P: 0.1, R: 0.1, I: 0.45, U: 0.2 }, selectionStatus: 'explicit' }
+      {
+        name: 'institutional_document',
+        componentWeights: { S: 0.15, P: 0.1, R: 0.1, I: 0.45, U: 0.2 },
+        selectionStatus: 'explicit'
+      }
     );
-    // 制度文書プロファイルではΔIの重みが高いため、
-    // LocalStorage永続化の影響度が増大する
     expect(institutionalImpact).toBeGreaterThan(generalImpact);
   });
 
   it('高リスク暗黙補完が全て uncertainty_handled であること', () => {
     const highRiskUnhandled = map.implicitAdditions
       .filter(i => i.risk === 'high' && !i.uncertaintyHandled);
-    
-    // このテストは失敗する（LocalStorage永続化が未処理）
     expect(highRiskUnhandled).toHaveLength(0);
   });
 });
@@ -1384,7 +1275,7 @@ describe('T-RDE v1: Todo App', () => {
 ## 11. CI/CD統合
 
 ```yaml
-# .github/workflows/t-rde-v2.yml
+# .github/workflows/t-rde-v1.yml
 name: T-RDE v1 Semantic Audit
 
 on:
@@ -1403,26 +1294,21 @@ jobs:
 
       - run: npm ci
 
-      # ΔU健全性を先行チェック（fast-fail）
       - name: ΔU soundness check
-        run: npx t-rde-v2 audit --check-uncertainty-only
+        run: npx t-rde-v1 audit --check-uncertainty-only
 
-      # フル監査
       - name: Full T-RDE v1 audit
-        run: npx t-rde-v2 audit --full --output report.json
+        run: npx t-rde-v1 audit --full --output report.json
 
-      # 品質ゲート（σ拒否条件は人間オーバーライド要求）
       - name: Quality gate
-        run: npx t-rde-v2 gate --config t-rde/gate.config.json
+        run: npx t-rde-v1 gate --config t-rde/gate.config.json
 
-      # コンセンサス監査（L3のみ、deep audit時）
       - name: Consensus audit (L3 only)
         if: env.TRDE_LEVEL == 'L3'
-        run: npx t-rde-v2 consensus --auditors 3
+        run: npx t-rde-v1 consensus --auditors 3
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
-      # レポート投稿
       - name: Post report
         uses: actions/github-script@v7
         with:
@@ -1463,7 +1349,7 @@ jobs:
        ↓
 2. LLMにコード生成を依頼（System Prompt に §3 の指示を含む）
        ↓
-3. LLMがコード + セマンティックマップv2を出力
+3. LLMがコード + セマンティックマップを出力
        ↓
 4. 監査レベルを選択（§8）
    ├─ L1: トレースマップ確認 → 意図の実装有無だけ確認して続行
@@ -1508,7 +1394,7 @@ jobs:
 
 ### 13.1 なぜT-RDE単独では不十分か
 
-T-RDE v1はΔM理論を横断観測レンズとして使い、意味変化の五成分とその方向性を監査する。しかし、ΔM理論自身が認めているとおり、これは「価値とは何かを最終的に決定する主理論」ではない。ソフトウェアの品質には、T-RDEが設計上捉えない——捉えようとしない——次元がある。
+T-RDE v1.0はΔM理論を横断観測レンズとして使い、意味変化の五成分とその方向性を監査する。しかし、ΔM理論自身が認めているとおり、これは「価値とは何かを最終的に決定する主理論」ではない。ソフトウェアの品質には、T-RDEが設計上捉えない——捉えようとしない——次元がある。
 
 形式的検証は「仕様に対するコードの数学的正当性」を扱う。T-RDEの「意味保存」は自然言語レベルの対応関係であり、型安全性や事前事後条件の充足とは異なる層にある。ユーザビリティテストは「人間が実際に使ったときの認知的・操作的体験」を扱う。IntentElementが全てpreservedでも、UIが使いにくければ価値は生まれない。アクセシビリティ監査は「多様な身体的・認知的条件を持つ人がアクセスできるか」を扱う。これはΔPの一側面だが、T-RDEのΔP評価は粒度が粗く、WCAG準拠の検証を代替しない。
 
@@ -1557,10 +1443,10 @@ ProjectMetadataは、LLMがセマンティックマップ内で自己申告す�
 
 ### 13.3 発火判定ロジック
 
-セマンティックマップv2の内容から、どの外部検証を推奨するかを自動判定する。ただし、v1.0ではセマンティックマップの自己報告依存を避けるため、ProjectMetadataによる常時発火ルールを先に評価する。
+セマンティックマップの内容から、どの外部検証を推奨するかを自動判定する。ただし、T-RDE v1.0ではセマンティックマップの自己報告依存を避けるため、ProjectMetadataによる常時発火ルールを先に評価する。
 
 ```typescript
-// t-rde-v2/complementary-verification.ts
+// t-rde-v1/complementary-verification.ts
 
 type VerificationMethod =
   | 'formal_verification'
@@ -1574,20 +1460,16 @@ interface VerificationRecommendation {
   priority: 'required' | 'recommended' | 'optional';
   reason: string;
   focusArea: string;
-  /** T-RDEの品質ゲートとの関係 */
   gateInteraction: 'blocking' | 'informational';
 }
 
 function recommendComplementaryVerification(
-  map: SemanticMapV2,
+  map: SemanticMapV1,
   ctx: VibeCodeContext,
   project: ProjectMetadata
 ): VerificationRecommendation[] {
   const recommendations: VerificationRecommendation[] = [];
-  
-  // ── ProjectMetadataによる常時発火ルール ──
-  // セマンティックマップはLLM自己報告に依存するため、
-  // プロジェクト属性から外部検証を直接発火させる。
+
   if (project.handlesPersonalData || project.hasAuthentication || project.hasPaymentOrBilling) {
     recommendations.push({
       method: 'security_review',
@@ -1597,7 +1479,7 @@ function recommendComplementaryVerification(
       gateInteraction: 'blocking',
     });
   }
-  
+
   if (project.publicFacing || project.accessibilityRequired || project.expectedUsers === 'public') {
     recommendations.push({
       method: 'accessibility_audit',
@@ -1607,7 +1489,7 @@ function recommendComplementaryVerification(
       gateInteraction: 'blocking',
     });
   }
-  
+
   if (project.safetyCritical || project.regulatedDomain) {
     recommendations.push({
       method: 'formal_verification',
@@ -1617,63 +1499,52 @@ function recommendComplementaryVerification(
       gateInteraction: 'blocking',
     });
   }
-  
-  // ── 形式的検証 ──
-  // 条件：ΔIが大きい変化がある、またはセキュリティ関連
+
   const hasSignificantDeltaI = map.intentElements
     .some(e => e.deltaMComponents.includes('I') && e.status !== 'preserved');
   const implicitDeltaI = map.implicitAdditions
     .some(i => i.affectedDeltaMComponents.includes('I') && i.risk !== 'low');
-  
+
   if (hasSignificantDeltaI || implicitDeltaI || ctx.hasSecurityConcern) {
     recommendations.push({
       method: 'formal_verification',
       priority: ctx.hasSecurityConcern ? 'required' : 'recommended',
-      reason: 'ΔIの変化または暗黙的な制度的配置の追加を検出。' +
-              '型安全性・事前事後条件・データ不変式の機械的検証が必要',
+      reason: 'ΔIの変化または暗黙的な制度的配置の追加を検出。型安全性・事前事後条件・データ不変式の機械的検証が必要',
       focusArea: identifyFormalVerificationTargets(map),
       gateInteraction: ctx.hasSecurityConcern ? 'blocking' : 'informational',
     });
   }
-  
-  // ── ユーザビリティテスト ──
-  // 条件：ΔPまたはΔRが変化した要素が3件以上
+
   const interactionChanges = map.intentElements.filter(e =>
     e.status !== 'preserved' &&
     (e.deltaMComponents.includes('P') || e.deltaMComponents.includes('R'))
   );
-  
+
   if (interactionChanges.length >= 3) {
     recommendations.push({
       method: 'usability_test',
       priority: 'recommended',
-      reason: `ΔP/ΔR変化要素が${interactionChanges.length}件。` +
-              '意味的に保存されていても操作体験の劣化がありうる',
+      reason: `ΔP/ΔR変化要素が${interactionChanges.length}件。意味的に保存されていても操作体験の劣化がありうる`,
       focusArea: interactionChanges.map(e => e.id).join(', '),
       gateInteraction: 'informational',
     });
   }
-  
-  // ── アクセシビリティ監査 ──
-  // 条件：UIコンポーネント生成を含む場合は常時推奨
+
   const hasUIGeneration = map.intentElements
     .some(e => e.mappedTo?.match(/component|view|page|screen|modal|dialog/i));
   const hasImplicitUI = map.implicitAdditions
     .some(i => i.description.match(/ボタン|フォーム|入力|表示|UI/));
-  
+
   if (hasUIGeneration || hasImplicitUI) {
     recommendations.push({
       method: 'accessibility_audit',
       priority: 'recommended',
-      reason: 'UI生成を含む。WCAG準拠・スクリーンリーダー対応の確認が必要。' +
-              'T-RDEのΔP評価はアクセシビリティの粒度を持たない',
+      reason: 'UI生成を含む。WCAG準拠・スクリーンリーダー対応の確認が必要。T-RDEのΔP評価はアクセシビリティの粒度を持たない',
       focusArea: 'コントラスト比、キーボード操作、ARIA属性、フォーカス管理',
       gateInteraction: 'informational',
     });
   }
-  
-  // ── パフォーマンステスト ──
-  // 条件：外部連携あり、またはデータ量依存の処理
+
   if (ctx.hasExternalIntegration || ctx.hasStatefulLogic) {
     recommendations.push({
       method: 'performance_test',
@@ -1683,41 +1554,35 @@ function recommendComplementaryVerification(
       gateInteraction: 'informational',
     });
   }
-  
-  // ── セキュリティレビュー ──
-  // 条件：security_concern、または暗黙補完にΔI + 高リスク
+
   if (ctx.hasSecurityConcern || implicitDeltaI) {
     recommendations.push({
       method: 'security_review',
       priority: ctx.hasSecurityConcern ? 'required' : 'recommended',
-      reason: '暗黙補完された認証・認可・データ保存ロジックの安全性は' +
-              'T-RDEの意味監査では検証できない',
+      reason: '暗黙補完された認証・認可・データ保存ロジックの安全性はT-RDEの意味監査では検証できない',
       focusArea: '入力検証、認証フロー、データ暗号化、依存パッケージ',
       gateInteraction: ctx.hasSecurityConcern ? 'blocking' : 'informational',
     });
   }
-  
+
   return recommendations;
 }
 
-/** 形式的検証の対象を特定する補助関数 */
-function identifyFormalVerificationTargets(map: SemanticMapV2): string {
+function identifyFormalVerificationTargets(map: SemanticMapV1): string {
   const targets: string[] = [];
-  
-  // transformed/deviated で ΔS を含む要素 → 型制約の検証候補
+
   for (const e of map.intentElements) {
     if (e.status === 'transformed' && e.deltaMComponents.includes('S')) {
       targets.push(`${e.id}: 意味変形の型レベル検証（${e.transformReason || '理由未記載'}）`);
     }
   }
-  
-  // ΔI を含む暗黙補完 → 不変式・事前条件の検証候補
+
   for (const i of map.implicitAdditions) {
     if (i.affectedDeltaMComponents.includes('I')) {
       targets.push(`暗黙補完: ${i.description} → データ不変式の検証`);
     }
   }
-  
+
   return targets.join('; ') || 'なし';
 }
 ```
@@ -1728,16 +1593,15 @@ function identifyFormalVerificationTargets(map: SemanticMapV2): string {
 
 **blocking統合**：セキュリティレビューや形式的検証など、結果がσの拒否条件に直接関わるもの。外部検証で脆弱性や型安全性違反が検出された場合、σの拒否条件が事後的に発動する。
 
-**informational統合**：ユーザビリティテストやアクセシビリティ監査など、T-RDEのΔM評価を補完する情報を提供するもの。品質ゲートの合否を直接変更しないが、セマンティックマップに注記として記録し、次回の差分監査で追跡する。ただしv1.0では、informationalな失敗が累積する場合、valueCeilingを下方補正する。
+**informational統合**：ユーザビリティテストやアクセシビリティ監査など、T-RDEのΔM評価を補完する情報を提供するもの。品質ゲートの合否を直接変更しないが、セマンティックマップに注記として記録し、次回の差分監査で追跡する。ただしT-RDE v1.0では、informationalな失敗が累積する場合、valueCeilingを下方補正する。
 
 ```typescript
-// t-rde-v2/gate-integration.ts
+// t-rde-v1/gate-integration.ts
 
 interface ExternalVerificationResult {
   method: VerificationMethod;
   passed: boolean;
   findings: string[];
-  /** この結果がσ拒否条件に該当するか */
   triggersVeto: boolean;
   vetoReason?: string;
 }
@@ -1749,24 +1613,17 @@ function integrateExternalResults(
   const updatedReasons = [...gateResult.reasons];
   let pass = gateResult.pass;
   let valueCeiling = gateResult.valueCeiling;
-  
+
   for (const ext of externalResults) {
     if (ext.triggersVeto) {
-      // blocking統合：外部検証が拒否条件を発動
       pass = false;
-      updatedReasons.push(
-        `外部検証 [${ext.method}] がσ拒否条件を発動: ${ext.vetoReason}`
-      );
+      updatedReasons.push(`外部検証 [${ext.method}] がσ拒否条件を発動: ${ext.vetoReason}`);
     } else if (!ext.passed) {
-      // informational統合：不合格だが品質ゲートは直接変更しない
-      // ただし、価値生成候補としての上限は制約する
       valueCeiling = Math.min(valueCeiling, 0.8);
-      updatedReasons.push(
-        `外部検証 [${ext.method}] 要注意: ${ext.findings.join(', ')}`
-      );
+      updatedReasons.push(`外部検証 [${ext.method}] 要注意: ${ext.findings.join(', ')}`);
     }
   }
-  
+
   return {
     ...gateResult,
     pass,
@@ -1781,7 +1638,7 @@ function integrateExternalResults(
 §12の推奨ワークフローのステップ7（品質ゲート判定）の直後に、以下を追加する。
 
 ```
-7. α-σ象限で品質ゲート判定（§7）
+7. 共鳴条件とα-σ象限で品質ゲート判定（§7）
        ↓
 7a. 外部検証の推奨判定（§13.3）
     - required → 該当する外部検証を実行（品質ゲートをblocking）
@@ -1841,17 +1698,17 @@ function integrateExternalResults(
 
 **セマンティックマップの自動生成精度**：§3のSystem Promptに従ってLLMがセマンティックマップを生成する際の精度は、モデル・プロンプト・コードの複雑さに依存する。特にsigmaContributionとuncertainty.confidenceの自己評価精度は検証されていない。コンセンサス監査（§6.3）と両方向検証（§6.2）はこの問題を緩和するが、完全には解決しない。
 
-**横断観測理論としてのΔMの限界**：ΔM理論自身が認めているとおり、美的価値や精神的な価値など、このフレームワークで捉えきれない価値の次元が存在する。T-RDE v1はΔMの一適用例であり、§13で述べた外部検証手法との併用が前提である。
+**横断観測理論としてのΔMの限界**：ΔM理論自身が認めているとおり、美的価値や精神的な価値など、このフレームワークで捉えきれない価値の次元が存在する。T-RDE v1.0はΔMの一適用例であり、§13で述べた外部検証手法との併用が前提である。
 
-**外部検証の発火ヒューリスティクスの精度**：§13.3の発火判定ロジックはセマンティックマップの内容に依存するが、セマンティックマップ自体がLLMの自己報告であるため、外部検証の必要性が過小評価される可能性がある。v1.0ではProjectMetadataによる常時発火ルールを追加したが、メタデータ自体を誰が、いつ、どの粒度で管理するかは今後の課題である。
+**外部検証の発火ヒューリスティクスの精度**：§13.3の発火判定ロジックはセマンティックマップの内容に依存するが、セマンティックマップ自体がLLMの自己報告であるため、外部検証の必要性が過小評価される可能性がある。T-RDE v1.0ではProjectMetadataによる常時発火ルールを追加したが、メタデータ自体を誰が、いつ、どの粒度で管理するかは今後の課題である。
 
-**暫定数値の制度化リスク**：σ重み、temporal drift重み、ΔU閾値、α算出係数はいずれも初期運用のための暫定値であり、理論的に確定した定数ではない。これらがレビュー文化の中で「正しい基準」として固定化されると、T-RDE自身が意味変化の監査対象になる。v1.0ではCalibrationPolicyを導入したが、実証的な調整手順は今後の課題である。
+**暫定数値の制度化リスク**：σ重み、temporal drift重み、ΔU閾値、α算出係数はいずれも初期運用のための暫定値であり、理論的に確定した定数ではない。これらがレビュー文化の中で「正しい基準」として固定化されると、T-RDE自身が意味変化の監査対象になる。T-RDE v1.0ではCalibrationPolicyを導入したが、実証的な調整手順は今後の課題である。
 
 ---
 
 ## 15. 考察：T-RDE文書生成そのものの再帰性
 
-本ガイドは、バイブコーディングにおける意味変化を監査するための文書である。しかし同時に、本ガイド自体もまた、LLMとの反復的な対話、批評、修正、再生成を通じて構築されている。その意味で、T-RDE v1は単にバイブコーディングを外部から評価する文書ではなく、自己自身の生成過程にT-RDE的監査を必要とする再帰的対象でもある。
+本ガイドは、バイブコーディングにおける意味変化を監査するための文書である。しかし同時に、本ガイド自体もまた、LLMとの反復的な対話、批評、修正、再生成を通じて構築されている。その意味で、T-RDE v1.0は単にバイブコーディングを外部から評価する文書ではなく、自己自身の生成過程にT-RDE的監査を必要とする再帰的対象でもある。
 
 この再帰性は偶然ではない。バイブコーディングとは、自然言語による意図提示、LLMによる実装または文書化、人間による批評、別モデルによる再批評、さらに人間による意味の再調整という循環的過程である。本ガイドの形成過程も、まさにこの構造を辿っている。すなわち、T-RDEは「生成されたコード」を監査するだけでなく、「生成された監査理論」そのものを監査する必要がある。
 
@@ -1871,7 +1728,7 @@ function integrateExternalResults(
 4. 実装上の便宜が、理論上の主張にすり替わっていないかを確認する。
 5. 本文書自体の変更履歴を、semantic mapまたはSLS（Semantic Lineage System）的に追跡可能にする。
 
-特に重要なのは、T-RDEが「意味変化の監査」を掲げる以上、T-RDE自身の更新もまたΔMとして評価されなければならないという点である。v0.3からv0.4、v0.5、そしてv1.0への更新は、単なる品質改善ではない。そこでは、共鳴の定義、σの扱い、ΔUの地位、外部検証の発火条件、低α・負σの解釈といった、文書の規範的中心が変化している。
+特に重要なのは、T-RDEが「意味変化の監査」を掲げる以上、T-RDE自身の更新もまたΔMとして評価されなければならないという点である。旧ドラフトからT-RDE v1.0への更新は、単なる品質改善ではない。そこでは、共鳴の定義、σの扱い、ΔUの地位、外部検証の発火条件、低α・負σの解釈といった、文書の規範的中心が変化している。
 
 したがって、今後のT-RDE更新では、各版の差分について以下を記録することが望ましい。
 
@@ -1888,9 +1745,9 @@ function integrateExternalResults(
 
 ---
 
-## 16. 付録：v1互換用severityアンカリング基準
+## 16. 付録：旧設計互換用severityアンカリング基準
 
-v1.0からの移行を容易にするため、五成分を単一のseverityに変換する基準を補助的に提供する。これはv2の主要評価軸ではなく、旧文書・旧テスト資産との互換のための橋渡しである。五成分をseverityへ還元できる、という理論的主張ではない。
+旧設計からの移行を容易にするため、五成分を単一のseverityに変換する基準を補助的に提供する。これはT-RDE v1.0の主要評価軸ではなく、旧文書・旧テスト資産との互換のための橋渡しである。五成分をseverityへ還元できる、という理論的主張ではない。
 
 | severity | 意味 | ΔM五成分との対応 |
 |----------|------|------------------|
@@ -1902,7 +1759,7 @@ v1.0からの移行を容易にするため、五成分を単一のseverityに�
 
 ---
 
-*T-RDE v1.0 — Tomoyuki Kano / ZYX Corp 人工叡智研究室*
-*理論的基盤: ΔM価値生成論 (Kano, 2026, Zenodo DOI: 10.5281/zenodo.20282012)*
+*T-RDE v1.0 — Tomoyuki Kano / ZYX Corp 人工叡智研究室*  
+*理論的基盤: ΔM価値生成論 (Kano, 2026, Zenodo DOI: 10.5281/zenodo.20282012)*  
 *関連理論: RTI (Kano, 2026, Zenodo DOI: 10.5281/zenodo.20078865)*
 

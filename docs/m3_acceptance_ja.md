@@ -10,7 +10,7 @@
 E2E スモーク: `npm run test:e2e`（拡張ホスト起動・preflight 契約）。  
 **本書:** Extension Development Host（F5）での手動 E2E。
 
-**T-RDE v1.0（意味監査）:** [`trde.config.json`](../trde.config.json) · L1 trace_map [`docs/trace_maps/m3-minimal-ui-l1.yaml`](trace_maps/m3-minimal-ui-l1.yaml) · ガイド [`t_rde_v_2_0_practical_guide.md`](t_rde_v_2_0_practical_guide.md)
+**T-RDE v1.0（意味監査）:** [`trde.config.json`](../trde.config.json) · L1 trace_map [`docs/trace_maps/m3-minimal-ui-l1.yaml`](trace_maps/m3-minimal-ui-l1.yaml) · ガイド [`t_rde_v_1.md`](t_rde_v_1.md)（§8 L1 / §7 品質ゲート）
 
 ---
 
@@ -205,5 +205,6 @@ M3 は CLI 受け入れを**置き換えない**。同一コマンド上の**人
 | 2026-05-20 | ゲート行 `i18n-ja`, `i18n-en`, `design-review`（`[32](https://github.com/zyx-corporation/kotonoha-management/blob/main/docs/32_milestone_ui_quality_gates_draft.md)`） |
 | 2026-05-26 | 日本語版 `m3_acceptance_ja.md` 追加。英文版と相互リンク                                                                                                                          |
 | 2026-05-20 | T-RDE L1 trace_map / cli-errors 手順 / B5 注記（[#13](https://github.com/zyx-corporation/kotonoha-vscode/issues/13)–[#19](https://github.com/zyx-corporation/kotonoha-vscode/issues/19)） |
+| 2026-05-27 | ガイド正式版 [`t_rde_v_1.md`](t_rde_v_1.md) に準拠（`semantic_map_v1` / 共鳴条件 / `expected_users`） |
 
 

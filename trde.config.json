@@ -1,5 +1,7 @@
 {
-  "comment": "T-RDE v1.0 ProjectMetadata — kotonoha-vscode (M3). See docs/t_rde_v_2_0_practical_guide.md §13.2.1",
+  "comment": "T-RDE v1.0 ProjectMetadata — kotonoha-vscode (M3). Normative: docs/t_rde_v_1.md §13.2.1",
+  "trde_version": "1.0",
+  "guide": "docs/t_rde_v_1.md",
   "project_metadata": {
     "public_facing": false,
     "handles_personal_data": true,
@@ -8,7 +10,7 @@
     "safety_critical": false,
     "regulated_domain": false,
     "accessibility_required": true,
-    "expected_users": "developers_and_reviewers"
+    "expected_users": "internal_team"
   },
   "domain_profile": {
     "name": "institutional_document",
