@@ -28,7 +28,7 @@ Run in this order:
 | Unit/Contract | `npm test` | Prevent regressions in CLI contracts, messages, and preflight rules | All tests pass |
 | E2E Smoke | `npm run test:e2e` | Ensure extension loads and baseline preflight path works | Exit code 0 |
 | Manual Gate | 9-row checklist below | Validate UI path, RBAC, i18n, and design review | All 9 rows checked |
-| T-RDE L2 (optional) | [execution prompt §9/§10](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_%E5%AE%9F%E8%A1%8C%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88_v_1_%E8%AB%96%E6%96%87%E6%BA%96%E6%8B%A0.md) + M3 diff | Meaning audit record | `semantic_map` or trace_map updated; human judgment points explicit |
+| T-RDE L2 (optional) | [execution prompt v1.1a §9/§5/§10](https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/t_rde_%E5%AE%9F%E8%A1%8C%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88_v_1_%E8%AB%96%E6%96%87%E6%BA%96%E6%8B%A0.md) + M3 diff | Meaning audit record | `semantic_map` or trace_map updated; human judgment points explicit |
 
 **T-RDE alignment:** update `trace_map` and `trde.config.json` against `kotonoha-spec/docs/T-RDE_v1.0.md` and the canonical execution prompt after manual gate completion.
 

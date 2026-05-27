@@ -1,6 +1,7 @@
 {
   "comment": "T-RDE v1.0 ProjectMetadata — kotonoha-vscode (M3). Guide canonical in kotonoha-spec §13.2.1",
   "trde_version": "1.0",
+  "execution_prompt_version": "1.1a",
   "guide_canonical_repository": "https://github.com/zyx-corporation/kotonoha-spec",
   "guide_path": "docs/T-RDE_v1.0.md",
   "guide": "https://github.com/zyx-corporation/kotonoha-spec/blob/main/docs/T-RDE_v1.0.md",
