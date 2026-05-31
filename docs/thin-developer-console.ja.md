@@ -5,6 +5,17 @@
 
 English: [`thin-developer-console.md`](thin-developer-console.md)。
 
+## CLI バージョン
+
+| 区分 | バージョン |
+| --- | --- |
+| 推奨 | **v0.3.1** |
+| 最小 | **v0.3.1** |
+
+正本ポリシー: [`kotonoha-docs` CLI 推奨バージョン](https://github.com/zyx-corporation/kotonoha-docs/blob/main/ja/manual/cli_version_policy.md)
+
+`kotonoha version` で確認。CLI は実行基盤であり、仕様正本（`kotonoha-spec`）ではない。
+
 ## 責務
 
 - `KOTONOHA_PRINCIPAL_ID` / `KOTONOHA_PROJECT_ID` を CLI コマンドへ渡す。

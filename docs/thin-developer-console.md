@@ -33,6 +33,17 @@ Kotonoha VSCode must not:
 - define sidecar formats outside `kotonoha-spec`
 - silently modify project files without explicit user action
 
+## CLI version
+
+| Scope | Version |
+| --- | --- |
+| Recommended | **v0.3.1** |
+| Minimum | **v0.3.1** |
+
+Canonical policy: [`kotonoha-docs` CLI version policy](https://github.com/zyx-corporation/kotonoha-docs/blob/main/en/manual/cli_version_policy.md).
+
+Verify with `kotonoha version`. The CLI is runtime, not normative spec (`kotonoha-spec` remains canonical).
+
 ## Expected Settings
 
 - `kotonoha.cliPath`
